@@ -47,7 +47,7 @@
                 <DataTemplate>
                     <StackPanel>
                         <TextBlock Text="{Binding Path=Title}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" FontWeight="Bold" />
-                        <TextBlock Text="{Binding Path=Content}" TextWrapping="Wrap" MaxHeight="80" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Path=Summary}" TextWrapping="Wrap" MaxHeight="80" TextTrimming="CharacterEllipsis" />
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
