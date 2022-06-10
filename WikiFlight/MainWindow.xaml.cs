@@ -139,6 +139,15 @@ namespace WikiFlight
             Disconnect();
         }
 
+        private void lstPages_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (lstPages.SelectedItem is Page selectedPage)
+            {
+                lstPages.SelectedIndex = -1;
+                Process.Start("explorer", selectedPage.URL);
+            }
+        }
+
         #endregion
 
         #region SimConnect event handlers

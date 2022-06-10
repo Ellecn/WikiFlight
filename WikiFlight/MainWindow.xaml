@@ -42,7 +42,7 @@
         </Grid>
         <TextBlock Grid.Row="4" Margin="4 4 4 0" FontSize="16" FontWeight="Bold">Things nearby</TextBlock>
         <TextBlock Grid.Row="5" FontStyle="Italic" Margin="4">Click to open Wikipedia page in your web browser.</TextBlock>
-        <ListView Grid.Row="6" SelectionMode="Single" BorderThickness="0" x:Name="lstPages" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListView Grid.Row="6" SelectionMode="Single" BorderThickness="0" x:Name="lstPages" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="lstPages_SelectionChanged">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
