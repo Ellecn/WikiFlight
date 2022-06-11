@@ -1,9 +1,12 @@
-﻿using Microsoft.FlightSimulator.SimConnect;
+﻿using Common;
+using Microsoft.FlightSimulator.SimConnect;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using WikipediaApi;
@@ -20,8 +23,12 @@ namespace WikiFlight
 
         private SimConnect? simConnect;
 
-        private DispatcherTimer PositionRefreshTimer = new DispatcherTimer();
-        private const int POSITION_REFRESH_INTERVAL_IN_SECONDS = 1;
+        private readonly DispatcherTimer PositionRefreshTimer = new DispatcherTimer();
+
+        private readonly WikipediaClient wikipediaClient = new WikipediaClient();
+        private readonly WikipediaPageCache wikipediaPageCache = new WikipediaPageCache();
+
+        private const int POSITION_REFRESH_INTERVAL_IN_SECONDS = 10;
 
         public MainWindow()
         {
@@ -31,15 +38,6 @@ namespace WikiFlight
 
             PositionRefreshTimer.Interval = TimeSpan.FromSeconds(POSITION_REFRESH_INTERVAL_IN_SECONDS);
             PositionRefreshTimer.Tick += PositionRefreshTimerTick;
-
-            for (int i = 0; i < 10; i++)
-            {
-                lstPages.Items.Add(new Page
-                {
-                    Title = "Title " + i,
-                    Summary = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
-                });
-            }
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -69,6 +67,8 @@ namespace WikiFlight
                     simConnect.AddToDataDefinition(DEFINITIONS.RequestedData, "Plane Latitude", "degrees", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
                     simConnect.AddToDataDefinition(DEFINITIONS.RequestedData, "Plane Longitude", "degrees", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
                     simConnect.RegisterDataDefineStruct<RequestedData>(DEFINITIONS.RequestedData);
+
+                    RequestNewPosition();
                 }
                 catch (Exception exception)
                 {
@@ -89,7 +89,7 @@ namespace WikiFlight
             SetUi(false);
         }
 
-        void PositionRefreshTimerTick(object sender, EventArgs e)
+        private void RequestNewPosition()
         {
             if (simConnect != null)
             {
@@ -106,6 +106,11 @@ namespace WikiFlight
             }
         }
 
+        private void PositionRefreshTimerTick(object sender, EventArgs e)
+        {
+            RequestNewPosition();
+        }
+
         private void SetUi(bool connected)
         {
             btnDisconnect.IsEnabled = connected;
@@ -120,6 +125,40 @@ namespace WikiFlight
         private void Log(string message)
         {
             Trace.WriteLine(message);
+        }
+
+        private async Task MakeMagic(Position currentPosition)
+        {
+            if (wikipediaClient.PositionOfLastRequest == null || currentPosition.GetDistance(wikipediaClient.PositionOfLastRequest) > 2000)
+            {
+                var pagesNearby = await wikipediaClient.GetPagesNearby(currentPosition);
+                wikipediaPageCache.Add(pagesNearby);
+
+                var pagesWithoutSummary = wikipediaPageCache.GetPagesWithoutSummary();
+                if (pagesWithoutSummary.Count > 0)
+                {
+                    await wikipediaClient.AddSummary(pagesWithoutSummary);
+                }
+
+                DisplayPages(currentPosition);
+            }
+        }
+
+        private void DisplayPages(Position currentPosition)
+        {
+            lstPages.Items.Clear();
+            var pagesForDisplay = wikipediaPageCache.Get(currentPosition);
+            pagesForDisplay.ForEach(p => p.Distance = p.Position.GetDistance(currentPosition));
+            pagesForDisplay.ForEach(p => lstPages.Items.Add(p));
+        }
+
+        private void OpenSelectedPageInBrowser()
+        {
+            if (lstPages.SelectedItem is WikipediaPage selectedPage)
+            {
+                lstPages.SelectedIndex = -1;
+                Process.Start("explorer", selectedPage.URL);
+            }
         }
 
         #region GUI event handlers
@@ -139,13 +178,9 @@ namespace WikiFlight
             Disconnect();
         }
 
-        private void lstPages_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void lstPages_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (lstPages.SelectedItem is Page selectedPage)
-            {
-                lstPages.SelectedIndex = -1;
-                Process.Start("explorer", selectedPage.URL);
-            }
+            OpenSelectedPageInBrowser();
         }
 
         #endregion
@@ -168,7 +203,7 @@ namespace WikiFlight
             return IntPtr.Zero;
         }
 
-        private void OnRecvSimobjectDataBytype(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA_BYTYPE data)
+        private async void OnRecvSimobjectDataBytype(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA_BYTYPE data)
         {
             if (data.dwRequestID == 0)
             {
@@ -176,8 +211,12 @@ namespace WikiFlight
 
                 Log(string.Format("New position data received: {0}|{1}", requestedData.latitude, requestedData.longitude));
 
-                txtLatitude.Text = requestedData.latitude.ToString();
-                txtLongitude.Text = requestedData.longitude.ToString();
+                Position currentPosition = new Position(requestedData.latitude, requestedData.longitude);
+
+                txtLatitude.Text = currentPosition.Latitude.ToString();
+                txtLongitude.Text = currentPosition.Longitude.ToString();
+
+                await MakeMagic(currentPosition);
             }
             //else
             //{
