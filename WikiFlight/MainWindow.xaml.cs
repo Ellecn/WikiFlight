@@ -30,9 +30,13 @@ namespace WikiFlight
 
         private const int POSITION_REFRESH_INTERVAL_IN_SECONDS = 10;
 
+        private readonly LogWindow logWindow = new LogWindow();
+
         public MainWindow()
         {
             InitializeComponent();
+
+            Trace.Listeners.Add(new LogTraceListener(logWindow.txtLog));
 
             SetUi(false);
 
@@ -72,7 +76,7 @@ namespace WikiFlight
                 }
                 catch (Exception exception)
                 {
-                    Log(string.Format("Could not connect to simulator ({0})", exception.Message));
+                    Trace.WriteLine(string.Format("Could not connect to simulator ({0})", exception.Message));
                 }
             }
         }
@@ -85,7 +89,7 @@ namespace WikiFlight
                 simConnect.Dispose();
                 simConnect = null;
             }
-            Log("Disconneted from sim");
+            Trace.WriteLine("Disconneted from sim");
             SetUi(false);
         }
 
@@ -96,11 +100,11 @@ namespace WikiFlight
                 try
                 {
                     simConnect.RequestDataOnSimObjectType(DATA_REQUESTS.REQUEST_1, DEFINITIONS.RequestedData, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
-                    Log("New position data requested");
+                    Trace.WriteLine("New position data requested");
                 }
                 catch (Exception exception)
                 {
-                    Log(exception.Message);
+                    Trace.WriteLine(exception.Message);
                     Disconnect();
                 }
             }
@@ -120,11 +124,6 @@ namespace WikiFlight
                 txtLatitude.Text = "n/a";
                 txtLongitude.Text = "n/a";
             }
-        }
-
-        private void Log(string message)
-        {
-            Trace.WriteLine(message);
         }
 
         private async Task MakeMagic(Position currentPosition)
@@ -173,14 +172,20 @@ namespace WikiFlight
             Disconnect();
         }
 
-        void Window_Closing(object sender, CancelEventArgs e)
+        protected override void OnClosing(CancelEventArgs e)
         {
             Disconnect();
+            App.Current.Shutdown();
         }
 
         private void lstPages_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             OpenSelectedPageInBrowser();
+        }
+
+        private void btnOpenLog_Click(object sender, RoutedEventArgs e)
+        {
+            logWindow.Show();
         }
 
         #endregion
@@ -209,7 +214,7 @@ namespace WikiFlight
             {
                 RequestedData requestedData = (RequestedData)data.dwData[0];
 
-                Log(string.Format("New position data received: {0}|{1}", requestedData.latitude, requestedData.longitude));
+                Trace.WriteLine(string.Format("New position data received: {0}|{1}", requestedData.latitude, requestedData.longitude));
 
                 Position currentPosition = new Position(requestedData.latitude, requestedData.longitude);
 
@@ -226,19 +231,19 @@ namespace WikiFlight
 
         private void OnRecvException(SimConnect sender, SIMCONNECT_RECV_EXCEPTION data)
         {
-            Log("Exception received: " + data.dwException);
+            Trace.WriteLine("Exception received: " + data.dwException);
         }
 
         private void OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
         {
-            Log("Connected to sim");
+            Trace.WriteLine("Connected to sim");
             PositionRefreshTimer.Start();
             SetUi(true);
         }
 
         private void OnRecvQuit(SimConnect sender, SIMCONNECT_RECV data)
         {
-            Log("Sim has exited");
+            Trace.WriteLine("Sim has exited");
             Disconnect();
         }
 
