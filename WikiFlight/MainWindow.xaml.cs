@@ -54,6 +54,12 @@ namespace WikiFlight
             handleSource.AddHook(HandleSimConnectEvents);
         }
 
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            Disconnect();
+            App.Current.Shutdown();
+        }
+
         private void Connect()
         {
             if (simConnect == null)
@@ -170,12 +176,6 @@ namespace WikiFlight
         private void btnDisconnect_Click(object sender, RoutedEventArgs e)
         {
             Disconnect();
-        }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            Disconnect();
-            App.Current.Shutdown();
         }
 
         private void lstPages_SelectionChanged(object sender, SelectionChangedEventArgs e)

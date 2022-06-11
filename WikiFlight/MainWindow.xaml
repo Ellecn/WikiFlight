@@ -5,10 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WikiFlight"
         mc:Ignorable="d"
-        Title="WikiFlight" Height="800" Width="400">
+        Title="WikiFlight v1.0-dev" Height="800" Width="400">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -17,14 +16,14 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Margin="4" FontSize="16" FontWeight="Bold">Connection to simulator</TextBlock>
+        <TextBlock Grid.Row="0" Margin="4" FontSize="16" FontWeight="Bold">Simulator connection</TextBlock>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Margin="4" x:Name="btnConnect" Click="btnConnect_Click">Connect to sim</Button>
-            <Button Grid.Column="1" Margin="4" x:Name="btnDisconnect" Click="btnDisconnect_Click">Disconnect from sim</Button>
+            <Button Grid.Column="0" Margin="4" x:Name="btnConnect" Click="btnConnect_Click">Connect</Button>
+            <Button Grid.Column="1" Margin="4" x:Name="btnDisconnect" Click="btnDisconnect_Click">Disconnect</Button>
         </Grid>
         <TextBlock Grid.Row="2" Margin="4" FontSize="16" FontWeight="Bold">Current position</TextBlock>
         <Grid Grid.Row="3">
@@ -42,8 +41,7 @@
             <TextBlock Grid.Row="1" Grid.Column="1" Margin="4" x:Name="txtLongitude">n/a</TextBlock>
         </Grid>
         <TextBlock Grid.Row="4" Margin="4 4 4 0" FontSize="16" FontWeight="Bold">Things nearby</TextBlock>
-        <TextBlock Grid.Row="5" FontStyle="Italic" Margin="4">Click to open Wikipedia page in your web browser.</TextBlock>
-        <ListView Grid.Row="6" SelectionMode="Single" BorderThickness="0" x:Name="lstPages" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="lstPages_SelectionChanged">
+        <ListView Grid.Row="5" SelectionMode="Single" BorderThickness="0" x:Name="lstPages" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="lstPages_SelectionChanged">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
@@ -60,6 +58,6 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Button Grid.Row="7" Margin="4" HorizontalAlignment="Right" x:Name="btnOpenLog" Click="btnOpenLog_Click">Show log</Button>
+        <Button Grid.Row="6" Margin="4" HorizontalAlignment="Right" x:Name="btnOpenLog" Click="btnOpenLog_Click">Show log</Button>
     </Grid>
 </Window>
