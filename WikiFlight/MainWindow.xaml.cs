@@ -1,13 +1,10 @@
 ﻿using Common;
-using Microsoft.FlightSimulator.SimConnect;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Interop;
 using System.Windows.Threading;
 using WikipediaApi;
 
@@ -18,19 +15,14 @@ namespace WikiFlight
     /// </summary>
     public partial class MainWindow : Window
     {
-        private IntPtr handle;
-        private const int WM_USER_SIMCONNECT = 0x402;
-
-        private SimConnect? simConnect;
-
-        private readonly DispatcherTimer PositionRefreshTimer = new DispatcherTimer();
-
-        private readonly WikipediaClient wikipediaClient = new WikipediaClient();
-        private readonly WikipediaPageCache wikipediaPageCache = new WikipediaPageCache();
-
-        private const int POSITION_REFRESH_INTERVAL_IN_SECONDS = 10;
+        private readonly int POSITION_REFRESH_INTERVAL_IN_SECONDS = 10;
 
         private readonly LogWindow logWindow = new LogWindow();
+
+        private readonly FlightSimulatorClient flightSimulatorClient;
+        private readonly WikipediaClient wikipediaClient = new WikipediaClient();
+        private readonly WikipediaPageCache wikipediaPageCache = new WikipediaPageCache();
+        private readonly DispatcherTimer PositionRefreshTimer = new DispatcherTimer();
 
         public MainWindow()
         {
@@ -38,7 +30,9 @@ namespace WikiFlight
 
             Trace.Listeners.Add(new LogTraceListener(logWindow.txtLog));
 
-            SetUi(false);
+            flightSimulatorClient = new FlightSimulatorClient(OnConnected, OnPositionReceived, OnSimExited);
+
+            SetUi();
 
             PositionRefreshTimer.Interval = TimeSpan.FromSeconds(POSITION_REFRESH_INTERVAL_IN_SECONDS);
             PositionRefreshTimer.Tick += PositionRefreshTimerTick;
@@ -47,11 +41,7 @@ namespace WikiFlight
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
-
-            handle = new WindowInteropHelper(this).Handle;
-
-            HwndSource handleSource = HwndSource.FromHwnd(handle);
-            handleSource.AddHook(HandleSimConnectEvents);
+            flightSimulatorClient.Init(this);
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -60,76 +50,53 @@ namespace WikiFlight
             App.Current.Shutdown();
         }
 
+        private void btnConnect_Click(object sender, RoutedEventArgs e)
+        {
+            Connect();
+        }
+
+        private void btnDisconnect_Click(object sender, RoutedEventArgs e)
+        {
+            Disconnect();
+        }
+
+        private void lstPages_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (lstPages.SelectedItem is WikipediaPage selectedPage)
+            {
+                lstPages.SelectedIndex = -1;
+                Process.Start("explorer", selectedPage.URL);
+            }
+        }
+
+        private void btnOpenLog_Click(object sender, RoutedEventArgs e)
+        {
+            logWindow.Show();
+        }
+
+        private void PositionRefreshTimerTick(object sender, EventArgs e)
+        {
+            flightSimulatorClient.RequestNewPosition();
+        }
+
         private void Connect()
         {
-            if (simConnect == null)
+            try
             {
-                try
-                {
-                    simConnect = new SimConnect("Managed Data Request", handle, WM_USER_SIMCONNECT, null, 0);
-
-                    simConnect.OnRecvOpen += new SimConnect.RecvOpenEventHandler(OnRecvOpen);
-                    simConnect.OnRecvQuit += new SimConnect.RecvQuitEventHandler(OnRecvQuit);
-                    simConnect.OnRecvException += new SimConnect.RecvExceptionEventHandler(OnRecvException);
-                    simConnect.OnRecvSimobjectDataBytype += new SimConnect.RecvSimobjectDataBytypeEventHandler(OnRecvSimobjectDataBytype);
-
-                    simConnect.AddToDataDefinition(DEFINITIONS.RequestedData, "Title", null, SIMCONNECT_DATATYPE.STRING256, 0.0f, SimConnect.SIMCONNECT_UNUSED);
-                    simConnect.AddToDataDefinition(DEFINITIONS.RequestedData, "Plane Latitude", "degrees", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
-                    simConnect.AddToDataDefinition(DEFINITIONS.RequestedData, "Plane Longitude", "degrees", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
-                    simConnect.RegisterDataDefineStruct<RequestedData>(DEFINITIONS.RequestedData);
-
-                    RequestNewPosition();
-                }
-                catch (Exception exception)
-                {
-                    Trace.WriteLine(string.Format("Could not connect to simulator ({0})", exception.Message));
-                }
+                flightSimulatorClient.Connect();
+                flightSimulatorClient.RequestNewPosition();
+            }
+            catch (Exception exception)
+            {
+                Trace.WriteLine(string.Format("Could not connect to simulator ({0})", exception.Message));
             }
         }
 
         private void Disconnect()
         {
             PositionRefreshTimer.Stop();
-            if (simConnect != null)
-            {
-                simConnect.Dispose();
-                simConnect = null;
-            }
-            Trace.WriteLine("Disconneted from sim");
-            SetUi(false);
-        }
-
-        private void RequestNewPosition()
-        {
-            if (simConnect != null)
-            {
-                try
-                {
-                    simConnect.RequestDataOnSimObjectType(DATA_REQUESTS.REQUEST_1, DEFINITIONS.RequestedData, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
-                    Trace.WriteLine("New position data requested");
-                }
-                catch (Exception exception)
-                {
-                    Trace.WriteLine(exception.Message);
-                    Disconnect();
-                }
-            }
-        }
-
-        private void PositionRefreshTimerTick(object sender, EventArgs e)
-        {
-            RequestNewPosition();
-        }
-
-        private void SetUi(bool connected)
-        {
-            btnDisconnect.IsEnabled = connected;
-            btnConnect.IsEnabled = !connected;
-            if (!connected)
-            {
-                txtLatitude.Text = "n/a";
-                txtLongitude.Text = "n/a";
-            }
+            flightSimulatorClient.Disconnect();
+            SetUi();
         }
 
         private async Task MakeMagic(Position currentPosition)
@@ -157,124 +124,41 @@ namespace WikiFlight
             pagesForDisplay.ForEach(p => lstPages.Items.Add(p));
         }
 
-        private void OpenSelectedPageInBrowser()
+        private void SetUi()
         {
-            if (lstPages.SelectedItem is WikipediaPage selectedPage)
+            bool connected = flightSimulatorClient.IsConnected();
+
+            btnDisconnect.IsEnabled = connected;
+            btnConnect.IsEnabled = !connected;
+            if (!connected)
             {
-                lstPages.SelectedIndex = -1;
-                Process.Start("explorer", selectedPage.URL);
+                txtLatitude.Text = "n/a";
+                txtLongitude.Text = "n/a";
             }
         }
 
-        #region GUI event handlers
+        #region FlightSimulatorClient event handlers
 
-        private void btnConnect_Click(object sender, RoutedEventArgs e)
+        private void OnConnected()
         {
-            Connect();
-        }
-
-        private void btnDisconnect_Click(object sender, RoutedEventArgs e)
-        {
-            Disconnect();
-        }
-
-        private void lstPages_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            OpenSelectedPageInBrowser();
-        }
-
-        private void btnOpenLog_Click(object sender, RoutedEventArgs e)
-        {
-            logWindow.Show();
-        }
-
-        #endregion
-
-        #region SimConnect event handlers
-
-        private IntPtr HandleSimConnectEvents(IntPtr hWnd, int message, IntPtr wParam, IntPtr lParam, ref bool isHandled)
-        {
-            isHandled = false;
-
-            if (message == WM_USER_SIMCONNECT)
-            {
-                if (simConnect != null)
-                {
-                    simConnect.ReceiveMessage(); // that invokes the corresponding event handlers
-                    isHandled = true;
-                }
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private async void OnRecvSimobjectDataBytype(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA_BYTYPE data)
-        {
-            if (data.dwRequestID == 0)
-            {
-                RequestedData requestedData = (RequestedData)data.dwData[0];
-
-                Trace.WriteLine(string.Format("New position data received: {0}|{1}", requestedData.latitude, requestedData.longitude));
-
-                Position currentPosition = new Position(requestedData.latitude, requestedData.longitude);
-
-                txtLatitude.Text = currentPosition.Latitude.ToString();
-                txtLongitude.Text = currentPosition.Longitude.ToString();
-
-                await MakeMagic(currentPosition);
-            }
-            //else
-            //{
-            //    Log("Unknown request ID: " + data.dwRequestID);
-            //}
-        }
-
-        private void OnRecvException(SimConnect sender, SIMCONNECT_RECV_EXCEPTION data)
-        {
-            Trace.WriteLine("Exception received: " + data.dwException);
-        }
-
-        private void OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
-        {
-            Trace.WriteLine("Connected to sim");
             PositionRefreshTimer.Start();
-            SetUi(true);
+            SetUi();
         }
 
-        private void OnRecvQuit(SimConnect sender, SIMCONNECT_RECV data)
+        private async void OnPositionReceived(Position currentPosition)
         {
-            Trace.WriteLine("Sim has exited");
+            txtLatitude.Text = currentPosition.Latitude.ToString();
+            txtLongitude.Text = currentPosition.Longitude.ToString();
+
+            await MakeMagic(currentPosition);
+        }
+
+        private void OnSimExited()
+        {
             Disconnect();
         }
 
         #endregion
 
-        #region structs and enums
-
-        private enum DEFINITIONS
-        {
-            RequestedData
-        }
-
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        private struct RequestedData
-        {
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x100)]
-            public string title;
-            public double latitude;
-            public double longitude;
-        }
-
-        private enum DATA_REQUESTS
-        {
-            REQUEST_1
-        }
-
-        private enum NOTIFICATION_GROUPS
-        {
-            GROUP0,
-        }
-
-        #endregion
     }
 }
