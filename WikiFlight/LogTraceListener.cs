@@ -16,10 +16,12 @@ namespace WikiFlight
         public override void Write(string? message)
         {
             textBox.Text = string.Format("{0}{1}: {2}", textBox.Text, DateTime.Now, message);
+            textBox.ScrollToEnd();
         }
         public override void WriteLine(string? message)
         {
             textBox.Text = string.Format("{0}{1}: {2}\n", textBox.Text, DateTime.Now, message);
+            textBox.ScrollToEnd();
         }
     }
 }
