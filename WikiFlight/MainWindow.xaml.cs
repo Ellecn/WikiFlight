@@ -65,7 +65,7 @@ namespace WikiFlight
             if (lstPages.SelectedItem is WikipediaPage selectedPage)
             {
                 lstPages.SelectedIndex = -1;
-                Process.Start("explorer", selectedPage.URL);
+                Process.Start("explorer", string.Format("\"{0}\"", selectedPage.URL));
             }
         }
 
