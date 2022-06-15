@@ -12,10 +12,11 @@ namespace WikipediaApi
 
         private static readonly HttpClient httpClient = new HttpClient();
 
-        public async Task<List<WikipediaPage>> GetPagesNearby(Position position, int radius = 5000, int limit = 50)
+        public async Task<List<WikipediaPage>> GetPagesNearby(string languageCode, Position position, int radius = 5000, int limit = 50)
         {
             var url = string.Format(
-                "https://de.wikipedia.org/w/api.php?action=query&format=json&list=geosearch&gscoord={0}|{1}&gsradius={2}&gslimit={3}",
+                "https://{0}.wikipedia.org/w/api.php?action=query&format=json&list=geosearch&gscoord={1}|{2}&gsradius={3}&gslimit={4}",
+                languageCode,
                 position.Latitude.ToString("00.0000", CultureInfo.CreateSpecificCulture("en-GB")),
                 position.Longitude.ToString("00.0000", CultureInfo.CreateSpecificCulture("en-GB")),
                 radius,
@@ -27,10 +28,10 @@ namespace WikipediaApi
             PositionOfLastRequest = position;
 
             var pageInfoList = geoSearchResult.GeoSearchQuery.PageInfoList;
-            return pageInfoList.Select(pi => new WikipediaPage(pi.PageId, pi.Title, new Position(pi.Latitude, pi.Longitude))).ToList();
+            return pageInfoList.Select(pi => new WikipediaPage(pi.PageId, languageCode, pi.Title, new Position(pi.Latitude, pi.Longitude))).ToList();
         }
 
-        public async Task<List<WikipediaPage>> AddSummary(List<WikipediaPage> pages)
+        public async Task<List<WikipediaPage>> AddSummary(List<WikipediaPage> pages, string languageCode)
         {
             if (pages.Count == 0)
             {
@@ -41,7 +42,8 @@ namespace WikipediaApi
             do
             {
                 var url = string.Format(
-                    "https://de.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&pageids={0}{1}",
+                    "https://{0}.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&pageids={1}{2}",
+                    languageCode,
                     string.Join("|", pages.Take(50).Select(pi => pi.PageId).ToList()),
                     pageResult == null ? "" : (pageResult.Continue == null ? "" : string.Format("&excontinue={0}&continue={1}", pageResult.Continue.ExcontinueParam, pageResult.Continue.ContinueParam)));
                 Trace.WriteLine("GET " + url);

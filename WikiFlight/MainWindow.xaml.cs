@@ -103,13 +103,13 @@ namespace WikiFlight
         {
             if (wikipediaClient.PositionOfLastRequest == null || currentPosition.GetDistance(wikipediaClient.PositionOfLastRequest) > 2000)
             {
-                var pagesNearby = await wikipediaClient.GetPagesNearby(currentPosition);
+                var pagesNearby = await wikipediaClient.GetPagesNearby(Configuration.GetInstance().WikipediaLanguageCode, currentPosition);
                 wikipediaPageCache.Add(pagesNearby);
 
                 var pagesWithoutSummary = wikipediaPageCache.GetPagesWithoutSummary();
                 if (pagesWithoutSummary.Count > 0)
                 {
-                    await wikipediaClient.AddSummary(pagesWithoutSummary);
+                    await wikipediaClient.AddSummary(pagesWithoutSummary, Configuration.GetInstance().WikipediaLanguageCode);
                 }
 
                 DisplayPages(currentPosition);
@@ -159,6 +159,5 @@ namespace WikiFlight
         }
 
         #endregion
-
     }
 }
