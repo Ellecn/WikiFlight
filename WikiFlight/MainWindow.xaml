@@ -48,7 +48,7 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ListView">
-                                        <TextBlock Margin="4" Text="No items in list..."/>
+                                        <TextBlock Margin="4" Text="No things nearby..."/>
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>

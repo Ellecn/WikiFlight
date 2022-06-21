@@ -16,10 +16,12 @@ namespace WikiFlight
 
         public List<WikipediaPage> Get(Position currentPosition, int radius)
         {
-            return pages.Where(p => currentPosition.GetDistance(p.Position) <= radius).OrderBy(p => p.Distance).ToList();
+            var pagesNearby = pages.Where(p => currentPosition.GetDistance(p.Position) <= radius).ToList();
+            pagesNearby.ForEach(p => p.Distance = currentPosition.GetDistance(p.Position));
+            return pagesNearby.OrderBy(p => p.Distance).ToList();
         }
 
-        public List<WikipediaPage> GetPagesWithoutSummary(Position currentPosition, int radius, int limit)
+        public List<WikipediaPage> GetPagesWithoutSummary(Position currentPosition, int radius, int limit = 50)
         {
             return Get(currentPosition, radius).Where(p => string.IsNullOrEmpty(p.Summary)).Take(limit).ToList();
         }

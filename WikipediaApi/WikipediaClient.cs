@@ -17,7 +17,7 @@ namespace WikipediaApi
             httpClient.DefaultRequestHeaders.Add("User-Agent", "WikiFlight/1.0-dev (https://github.com/Ellecn/WikiFlight)");
         }
 
-        public async Task<List<WikipediaPage>> GetPagesNearby(string languageCode, Position position, int radius, int limit)
+        public async Task<List<WikipediaPage>> GetPagesNearby(string languageCode, Position position, int radius, int limit = 50)
         {
             var url = string.Format(
                 "https://{0}.wikipedia.org/w/api.php?action=query&format=json&list=geosearch&gscoord={1}|{2}&gsradius={3}&gslimit={4}",

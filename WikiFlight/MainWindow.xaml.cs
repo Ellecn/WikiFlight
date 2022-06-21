@@ -15,10 +15,8 @@ namespace WikiFlight
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly int POSITION_REFRESH_INTERVAL_IN_SECONDS = 10;
-        private readonly int DISTANCE_THRESHOLD_IN_METER = 2000;
-        private readonly int PAGE_SEARCH_RADIUS = 5000;
-        private readonly int PAGE_SEARCH_COUNT = 30; // max 50 !
+        private readonly int REFRESH_INTERVAL_IN_SECONDS = 10;
+        private readonly int SEARCH_RADIUS = 5000;
         private readonly string WIKIPEDIA_LANGUAGE_CODE = "de";
 
         private readonly LogWindow logWindow = new LogWindow();
@@ -38,7 +36,7 @@ namespace WikiFlight
 
             SetUi();
 
-            PositionRefreshTimer.Interval = TimeSpan.FromSeconds(POSITION_REFRESH_INTERVAL_IN_SECONDS);
+            PositionRefreshTimer.Interval = TimeSpan.FromSeconds(REFRESH_INTERVAL_IN_SECONDS);
             PositionRefreshTimer.Tick += PositionRefreshTimerTick;
         }
 
@@ -100,17 +98,19 @@ namespace WikiFlight
         {
             PositionRefreshTimer.Stop();
             flightSimulatorClient.Disconnect();
+            wikipediaClient.PositionOfLastRequest = null;
+            lstPages.Items.Clear();
             SetUi();
         }
 
         private async Task Refresh(Position currentPosition)
         {
-            if (wikipediaClient.PositionOfLastRequest == null || currentPosition.GetDistance(wikipediaClient.PositionOfLastRequest) > DISTANCE_THRESHOLD_IN_METER)
+            if (wikipediaClient.PositionOfLastRequest == null || currentPosition.GetDistance(wikipediaClient.PositionOfLastRequest) > 10)
             {
-                var pagesNearby = await wikipediaClient.GetPagesNearby(WIKIPEDIA_LANGUAGE_CODE, currentPosition, PAGE_SEARCH_RADIUS, PAGE_SEARCH_COUNT);
+                var pagesNearby = await wikipediaClient.GetPagesNearby(WIKIPEDIA_LANGUAGE_CODE, currentPosition, SEARCH_RADIUS);
                 wikipediaPageCache.AddNewPagesOnly(pagesNearby);
 
-                var pagesWithoutSummary = wikipediaPageCache.GetPagesWithoutSummary(currentPosition, PAGE_SEARCH_RADIUS, PAGE_SEARCH_COUNT);
+                var pagesWithoutSummary = wikipediaPageCache.GetPagesWithoutSummary(currentPosition, SEARCH_RADIUS);
                 if (pagesWithoutSummary.Count > 0)
                 {
                     await wikipediaClient.AddSummary(pagesWithoutSummary, WIKIPEDIA_LANGUAGE_CODE);
@@ -123,8 +123,7 @@ namespace WikiFlight
         private void DisplayPages(Position currentPosition)
         {
             lstPages.Items.Clear();
-            var pagesForDisplay = wikipediaPageCache.Get(currentPosition, PAGE_SEARCH_RADIUS);
-            pagesForDisplay.ForEach(p => p.Distance = p.Position.GetDistance(currentPosition));
+            var pagesForDisplay = wikipediaPageCache.Get(currentPosition, SEARCH_RADIUS);
             pagesForDisplay.ForEach(p => lstPages.Items.Add(p));
         }
 
