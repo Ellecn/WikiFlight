@@ -59,9 +59,9 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <TextBlock TextWrapping="Wrap" TextTrimming="CharacterEllipsis" FontWeight="Bold">
+                        <TextBlock TextWrapping="Wrap" FontWeight="Bold">
                             <TextBlock.Text>
-                                <MultiBinding StringFormat="{}{0} ({1}m away)">
+                                <MultiBinding StringFormat="{}{0} [{1}m away]">
                                     <Binding Path="Title" />
                                     <Binding Path="Distance" />
                                 </MultiBinding>
