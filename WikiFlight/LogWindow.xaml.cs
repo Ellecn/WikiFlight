@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows;
 
 namespace WikiFlight
@@ -13,10 +14,25 @@ namespace WikiFlight
             InitializeComponent();
         }
 
+        protected override void OnContentRendered(EventArgs e)
+        {
+            txtLog.ScrollToEnd();
+        }
+
         protected override void OnClosing(CancelEventArgs e)
         {
             e.Cancel = true;
             Hide();
+        }
+
+        private void btnCopy_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetText(txtLog.Text);
+        }
+
+        private void btnClear_Click(object sender, RoutedEventArgs e)
+        {
+            txtLog.Clear();
         }
     }
 }

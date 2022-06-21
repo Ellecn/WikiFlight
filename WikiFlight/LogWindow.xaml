@@ -6,7 +6,11 @@
         xmlns:local="clr-namespace:WikiFlight"
         mc:Ignorable="d"
         Title="WikiFlight - Log" Height="450" Width="800">
-    <Grid>
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top">
+            <Button Content="Copy" Click="btnCopy_Click" />
+            <Button Content="Clear" Click="btnClear_Click" />
+        </ToolBar>
         <TextBox x:Name="txtLog" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
-    </Grid>
+    </DockPanel>
 </Window>
