@@ -41,6 +41,21 @@
         </Grid>
         <Separator Grid.Row="3" />
         <ListView Grid.Row="4" SelectionMode="Single" BorderThickness="0" x:Name="lstPages" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="lstPages_SelectionChanged">
+            <ListView.Style>
+                <Style TargetType="ListView">
+                    <Style.Triggers>
+                        <Trigger Property="HasItems" Value="False">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListView">
+                                        <TextBlock Margin="4" Text="No items in list..."/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.Style>
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
