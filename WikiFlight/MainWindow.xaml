@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WikiFlight"
         mc:Ignorable="d"
-        Title="WikiFlight v1.0-dev" Height="800" Width="400">
+        Title="WikiFlight" Height="800" Width="400">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -14,36 +14,32 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Margin="4" FontSize="16" FontWeight="Bold">Simulator connection</TextBlock>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Margin="4" Padding="8 2 8 2" x:Name="btnConnect" Click="btnConnect_Click">Connect</Button>
-            <Button Grid.Column="1" Margin="4" Padding="8 2 8 2" x:Name="btnDisconnect" Click="btnDisconnect_Click">Disconnect</Button>
+            <Button Grid.Column="0" Margin="4" Padding="8 2 8 2" x:Name="btnConnect" Click="btnConnect_Click">Connect to MSFS2020</Button>
+            <Button Grid.Column="1" Margin="4" Padding="8 2 8 2" x:Name="btnDisconnect" Click="btnDisconnect_Click">Disconnect from MSFS2020</Button>
         </Grid>
-        <Expander Grid.Row="2" Margin="4">
-            <Expander.Header>
-                <TextBlock FontSize="16" FontWeight="Bold">Current position</TextBlock>
-            </Expander.Header>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Margin="4">Latitude:</TextBlock>
-                <TextBlock Grid.Row="1" Grid.Column="0" Margin="4">Longitude:</TextBlock>
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLatitude">n/a</TextBox>
-                <TextBox Grid.Row="1" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLongitude">n/a</TextBox>
-            </Grid>
-        </Expander>
-        <TextBlock Grid.Row="3" Margin="4" FontSize="16" FontWeight="Bold">Things nearby</TextBlock>
+        <Separator Grid.Row="1" />
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" Margin="4">Latitude:</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="4">Longitude:</TextBlock>
+            <TextBox Grid.Row="0" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLatitude">n/a</TextBox>
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLongitude">n/a</TextBox>
+        </Grid>
+        <Separator Grid.Row="3" />
         <ListView Grid.Row="4" SelectionMode="Single" BorderThickness="0" x:Name="lstPages" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="lstPages_SelectionChanged">
             <ListView.ItemTemplate>
                 <DataTemplate>
@@ -61,6 +57,15 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Button Grid.Row="5" Margin="4" HorizontalAlignment="Right" x:Name="btnOpenLog" Click="btnOpenLog_Click">Show log</Button>
+        <Separator Grid.Row="5" />
+        <Grid Grid.Row="6" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Margin="4">Version 1.0-dev</TextBlock>
+            <Button Grid.Column="2" Margin="4" HorizontalAlignment="Right" x:Name="btnOpenLog" Click="btnOpenLog_Click">Show log</Button>
+        </Grid>
     </Grid>
 </Window>
