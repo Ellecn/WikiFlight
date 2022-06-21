@@ -10,7 +10,12 @@ namespace WikipediaApi
     {
         public Position? PositionOfLastRequest { get; set; }
 
-        private static readonly HttpClient httpClient = new HttpClient();
+        private readonly HttpClient httpClient = new HttpClient();
+
+        public WikipediaClient()
+        {
+            httpClient.DefaultRequestHeaders.Add("User-Agent", "WikiFlight/1.0-dev (https://github.com/Ellecn/WikiFlight)");
+        }
 
         public async Task<List<WikipediaPage>> GetPagesNearby(string languageCode, Position position, int radius, int limit)
         {
@@ -54,7 +59,7 @@ namespace WikipediaApi
                 {
                     if (pageResult.PageQuery.Pages[p.PageId].Summary != null)
                     {
-                        p.Summary = pageResult.PageQuery.Pages[p.PageId].Summary;
+                        p.Summary = pageResult.PageQuery.Pages[p.PageId].Summary.Trim();
                     }
                 });
             } while (pageResult.Continue != null);
