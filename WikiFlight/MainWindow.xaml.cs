@@ -16,6 +16,10 @@ namespace WikiFlight
     public partial class MainWindow : Window
     {
         private readonly int POSITION_REFRESH_INTERVAL_IN_SECONDS = 10;
+        private readonly int DISTANCE_THRESHOLD_IN_METER = 2000;
+        private readonly int PAGE_SEARCH_RADIUS = 5000;
+        private readonly int PAGE_SEARCH_COUNT = 30; // max 50 !
+        private readonly string WIKIPEDIA_LANGUAGE_CODE = "de";
 
         private readonly LogWindow logWindow = new LogWindow();
 
@@ -99,17 +103,17 @@ namespace WikiFlight
             SetUi();
         }
 
-        private async Task MakeMagic(Position currentPosition)
+        private async Task Refresh(Position currentPosition)
         {
-            if (wikipediaClient.PositionOfLastRequest == null || currentPosition.GetDistance(wikipediaClient.PositionOfLastRequest) > 2000)
+            if (wikipediaClient.PositionOfLastRequest == null || currentPosition.GetDistance(wikipediaClient.PositionOfLastRequest) > DISTANCE_THRESHOLD_IN_METER)
             {
-                var pagesNearby = await wikipediaClient.GetPagesNearby(Configuration.GetInstance().WikipediaLanguageCode, currentPosition);
-                wikipediaPageCache.Add(pagesNearby);
+                var pagesNearby = await wikipediaClient.GetPagesNearby(WIKIPEDIA_LANGUAGE_CODE, currentPosition, PAGE_SEARCH_RADIUS, PAGE_SEARCH_COUNT);
+                wikipediaPageCache.AddNewPagesOnly(pagesNearby);
 
-                var pagesWithoutSummary = wikipediaPageCache.GetPagesWithoutSummary();
+                var pagesWithoutSummary = wikipediaPageCache.GetPagesWithoutSummary(currentPosition, PAGE_SEARCH_RADIUS, PAGE_SEARCH_COUNT);
                 if (pagesWithoutSummary.Count > 0)
                 {
-                    await wikipediaClient.AddSummary(pagesWithoutSummary, Configuration.GetInstance().WikipediaLanguageCode);
+                    await wikipediaClient.AddSummary(pagesWithoutSummary, WIKIPEDIA_LANGUAGE_CODE);
                 }
 
                 DisplayPages(currentPosition);
@@ -119,7 +123,7 @@ namespace WikiFlight
         private void DisplayPages(Position currentPosition)
         {
             lstPages.Items.Clear();
-            var pagesForDisplay = wikipediaPageCache.Get(currentPosition);
+            var pagesForDisplay = wikipediaPageCache.Get(currentPosition, PAGE_SEARCH_RADIUS);
             pagesForDisplay.ForEach(p => p.Distance = p.Position.GetDistance(currentPosition));
             pagesForDisplay.ForEach(p => lstPages.Items.Add(p));
         }
@@ -150,7 +154,7 @@ namespace WikiFlight
             txtLatitude.Text = currentPosition.Latitude.ToString();
             txtLongitude.Text = currentPosition.Longitude.ToString();
 
-            await MakeMagic(currentPosition);
+            await Refresh(currentPosition);
         }
 
         private void OnSimExited()

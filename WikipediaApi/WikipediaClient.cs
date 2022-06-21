@@ -12,7 +12,7 @@ namespace WikipediaApi
 
         private static readonly HttpClient httpClient = new HttpClient();
 
-        public async Task<List<WikipediaPage>> GetPagesNearby(string languageCode, Position position, int radius = 5000, int limit = 50)
+        public async Task<List<WikipediaPage>> GetPagesNearby(string languageCode, Position position, int radius, int limit)
         {
             var url = string.Format(
                 "https://{0}.wikipedia.org/w/api.php?action=query&format=json&list=geosearch&gscoord={1}|{2}&gsradius={3}&gslimit={4}",
