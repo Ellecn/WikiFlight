@@ -81,11 +81,6 @@ namespace WikiFlight
             logWindow.Show();
         }
 
-        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
-        {
-            Process.Start("explorer", string.Format("\"{0}\"", e.Uri.AbsoluteUri));
-        }
-
         private async void ListViewExpander_Expanded(object sender, RoutedEventArgs e)
         {
             Expander expander = (Expander)sender;

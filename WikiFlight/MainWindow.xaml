@@ -46,7 +46,6 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -68,9 +67,6 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <TextBlock Grid.Row="0" Grid.Column="2" Margin="4">
-                <Hyperlink NavigateUri="https://en.wikipedia.org/wiki/List_of_Wikipedias" RequestNavigate="Hyperlink_RequestNavigate">More info</Hyperlink>
-            </TextBlock>
         </Grid>
         <Separator Grid.Row="5" />
         <ListView Grid.Row="6" SelectionMode="Single" BorderThickness="0" x:Name="lstPages" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="lstPages_SelectionChanged">
