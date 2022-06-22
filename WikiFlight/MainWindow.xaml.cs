@@ -21,14 +21,14 @@ namespace WikiFlight
 
         private readonly LogWindow logWindow = new LogWindow();
 
-        private readonly FlightSimulatorService flightSimulatorClient;
-        private readonly WikipediaService wikipediaClient = new WikipediaService();
+        private readonly FlightSimulatorService flightSimulatorService; // TODO: umbenennen
+        private readonly WikipediaService wikipediaService = new WikipediaService(); // TODO: umbenennen
 
         private readonly DispatcherTimer PositionRefreshTimer = new DispatcherTimer();
 
         private Position? positionOfLastRequest;
 
-        private Settings settings = new Settings();
+        private readonly Settings settings = new Settings();
 
         public MainWindow()
         {
@@ -37,7 +37,7 @@ namespace WikiFlight
 
             Trace.Listeners.Add(new LogTraceListener(logWindow.txtLog));
 
-            flightSimulatorClient = new FlightSimulatorService(OnConnected, OnPositionReceived, OnSimExited);
+            flightSimulatorService = new FlightSimulatorService(OnConnected, OnPositionReceived, OnSimExited);
 
             SetUi();
 
@@ -48,7 +48,7 @@ namespace WikiFlight
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
-            flightSimulatorClient.Init(this);
+            flightSimulatorService.Init(this);
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -86,17 +86,28 @@ namespace WikiFlight
             Process.Start("explorer", string.Format("\"{0}\"", e.Uri.AbsoluteUri));
         }
 
+        private async void ListViewExpander_Expanded(object sender, RoutedEventArgs e)
+        {
+            Expander expander = (Expander)sender;
+            WikipediaPage wikipediaPage = (WikipediaPage)expander.DataContext;
+            if (string.IsNullOrEmpty(wikipediaPage.Summary))
+            {
+                string? summary = await wikipediaService.GetSummary(wikipediaPage);
+                wikipediaPage.Summary = summary ?? "";
+            }
+        }
+
         private void PositionRefreshTimerTick(object sender, EventArgs e)
         {
-            flightSimulatorClient.RequestNewPosition();
+            flightSimulatorService.RequestNewPosition();
         }
 
         private void Connect()
         {
             try
             {
-                flightSimulatorClient.Connect();
-                flightSimulatorClient.RequestNewPosition();
+                flightSimulatorService.Connect();
+                flightSimulatorService.RequestNewPosition();
             }
             catch (Exception exception)
             {
@@ -107,7 +118,7 @@ namespace WikiFlight
         private void Disconnect()
         {
             PositionRefreshTimer.Stop();
-            flightSimulatorClient.Disconnect();
+            flightSimulatorService.Disconnect();
             positionOfLastRequest = null;
             lstPages.Items.Clear();
             SetUi();
@@ -117,7 +128,7 @@ namespace WikiFlight
         {
             if (positionOfLastRequest == null || currentPosition.GetDistance(positionOfLastRequest) > 10)
             {
-                var pagesNearby = await wikipediaClient.GetPagesNearby(settings.WikipediaLanguageCode, currentPosition, settings.SearchRadiusInMeter);
+                var pagesNearby = await wikipediaService.GetPagesNearby(settings.WikipediaLanguageCode, currentPosition, settings.SearchRadiusInMeter);
                 positionOfLastRequest = currentPosition;
 
                 lstPages.Items.Clear();
@@ -127,7 +138,7 @@ namespace WikiFlight
 
         private void SetUi()
         {
-            bool connected = flightSimulatorClient.IsConnected();
+            bool connected = flightSimulatorService.IsConnected();
 
             btnDisconnect.IsEnabled = connected;
             btnConnect.IsEnabled = !connected;

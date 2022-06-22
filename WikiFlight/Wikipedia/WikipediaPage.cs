@@ -1,9 +1,12 @@
-﻿using WikiFlight.Common;
+﻿using System.ComponentModel;
+using WikiFlight.Common;
 
 namespace WikiFlight.Wikipedia
 {
-    public class WikipediaPage
+    public class WikipediaPage : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public WikipediaPage(long pageId, string languageCode, string title, Position position)
         {
             PageId = pageId;
@@ -19,7 +22,16 @@ namespace WikiFlight.Wikipedia
 
         public string Title { get; }
 
-        public string Summary { get; set; }
+        private string _summary = "";
+        public string Summary
+        {
+            get { return _summary; }
+            set
+            {
+                _summary = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Summary)));
+            }
+        }
 
         public Position Position { get; }
 

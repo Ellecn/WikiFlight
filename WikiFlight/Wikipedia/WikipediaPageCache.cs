@@ -10,7 +10,7 @@ namespace WikiFlight.Wikipedia
 
         public void AddNewPagesOnly(List<WikipediaPage> pages)
         {
-            var newPages = pages.Where(p => !this.pages.Any(pp => p.PageId == pp.PageId));
+            var newPages = pages.Where(p => !this.pages.Any(pp => p.PageId == pp.PageId && p.LanguageCode.Equals(pp.LanguageCode)));
             this.pages.AddRange(newPages);
         }
 

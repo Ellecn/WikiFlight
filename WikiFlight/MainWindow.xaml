@@ -91,17 +91,19 @@
             </ListView.Style>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel>
-                        <TextBlock TextWrapping="Wrap" FontWeight="Bold">
-                            <TextBlock.Text>
-                                <MultiBinding StringFormat="{}{0} [{1}m away]">
-                                    <Binding Path="Title" />
-                                    <Binding Path="Distance" />
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
+                    <Expander Expanded="ListViewExpander_Expanded">
+                        <Expander.Header>
+                            <TextBlock TextWrapping="Wrap" FontWeight="Bold">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} [{1}m away]">
+                                        <Binding Path="Title" />
+                                        <Binding Path="Distance" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Expander.Header>
                         <TextBlock Text="{Binding Path=Summary}" TextWrapping="Wrap" MaxHeight="80" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
+                    </Expander>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
