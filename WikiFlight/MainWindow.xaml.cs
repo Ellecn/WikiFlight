@@ -97,6 +97,12 @@ namespace WikiFlight
             }
         }
 
+        private void CheckBoxAlwaysOnTop_Changed(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            Topmost = checkBox.IsChecked ?? false;
+        }
+
         private void PositionRefreshTimerTick(object sender, EventArgs e)
         {
             flightSimulatorService.RequestNewPosition();

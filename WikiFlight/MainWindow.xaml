@@ -110,11 +110,12 @@
         <Separator Grid.Row="7" />
         <Grid Grid.Row="8" >
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Margin="4">Version 1.0-dev</TextBlock>
+            <CheckBox Grid.Column="0" Margin="4" HorizontalAlignment="Left" Checked="CheckBoxAlwaysOnTop_Changed" Unchecked="CheckBoxAlwaysOnTop_Changed">Always on top</CheckBox>
+            <TextBlock Grid.Column="1" Margin="4" HorizontalAlignment="Center">Version 1.0-dev</TextBlock>
             <Button Grid.Column="2" Margin="4" HorizontalAlignment="Right" x:Name="btnOpenLog" Click="btnOpenLog_Click">Show log</Button>
         </Grid>
     </Grid>
