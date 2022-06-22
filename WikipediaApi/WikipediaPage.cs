@@ -1,4 +1,6 @@
-﻿namespace Common
+﻿using Common;
+
+namespace WikipediaApi
 {
     public class WikipediaPage
     {

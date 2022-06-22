@@ -1,10 +1,8 @@
 ﻿using Common;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace WikiFlight
+namespace WikipediaApi
 {
-    class WikipediaPageCache
+    internal class WikipediaPageCache
     {
         private List<WikipediaPage> pages = new List<WikipediaPage>();
 

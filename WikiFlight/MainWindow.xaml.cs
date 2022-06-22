@@ -16,15 +16,16 @@ namespace WikiFlight
     public partial class MainWindow : Window
     {
         private readonly int REFRESH_INTERVAL_IN_SECONDS = 10;
-        private readonly int SEARCH_RADIUS = 5000;
+        private readonly int SEARCH_RADIUS_IN_METER = 5000;
         private readonly string WIKIPEDIA_LANGUAGE_CODE = "de";
 
         private readonly LogWindow logWindow = new LogWindow();
 
         private readonly FlightSimulatorClient flightSimulatorClient;
         private readonly WikipediaClient wikipediaClient = new WikipediaClient();
-        private readonly WikipediaPageCache wikipediaPageCache = new WikipediaPageCache();
         private readonly DispatcherTimer PositionRefreshTimer = new DispatcherTimer();
+
+        private Position? positionOfLastRequest;
 
         public MainWindow()
         {
@@ -49,7 +50,7 @@ namespace WikiFlight
         protected override void OnClosing(CancelEventArgs e)
         {
             Disconnect();
-            App.Current.Shutdown();
+            Application.Current.Shutdown();
         }
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
@@ -98,33 +99,21 @@ namespace WikiFlight
         {
             PositionRefreshTimer.Stop();
             flightSimulatorClient.Disconnect();
-            wikipediaClient.PositionOfLastRequest = null;
+            positionOfLastRequest = null;
             lstPages.Items.Clear();
             SetUi();
         }
 
         private async Task Refresh(Position currentPosition)
         {
-            if (wikipediaClient.PositionOfLastRequest == null || currentPosition.GetDistance(wikipediaClient.PositionOfLastRequest) > 10)
+            if (positionOfLastRequest == null || currentPosition.GetDistance(positionOfLastRequest) > 10)
             {
-                var pagesNearby = await wikipediaClient.GetPagesNearby(WIKIPEDIA_LANGUAGE_CODE, currentPosition, SEARCH_RADIUS);
-                wikipediaPageCache.AddNewPagesOnly(pagesNearby);
+                var pagesNearby = await wikipediaClient.GetPagesNearby(WIKIPEDIA_LANGUAGE_CODE, currentPosition, SEARCH_RADIUS_IN_METER);
+                positionOfLastRequest = currentPosition;
 
-                var pagesWithoutSummary = wikipediaPageCache.GetPagesWithoutSummary(currentPosition, SEARCH_RADIUS);
-                if (pagesWithoutSummary.Count > 0)
-                {
-                    await wikipediaClient.AddSummary(pagesWithoutSummary, WIKIPEDIA_LANGUAGE_CODE);
-                }
-
-                DisplayPages(currentPosition);
+                lstPages.Items.Clear();
+                pagesNearby.ForEach(p => lstPages.Items.Add(p));
             }
-        }
-
-        private void DisplayPages(Position currentPosition)
-        {
-            lstPages.Items.Clear();
-            var pagesForDisplay = wikipediaPageCache.Get(currentPosition, SEARCH_RADIUS);
-            pagesForDisplay.ForEach(p => lstPages.Items.Add(p));
         }
 
         private void SetUi()

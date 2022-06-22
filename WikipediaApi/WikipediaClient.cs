@@ -8,7 +8,7 @@ namespace WikipediaApi
 {
     public class WikipediaClient
     {
-        public Position? PositionOfLastRequest { get; set; }
+        private readonly WikipediaPageCache cache = new WikipediaPageCache();
 
         private readonly HttpClient httpClient = new HttpClient();
 
@@ -17,7 +17,22 @@ namespace WikipediaApi
             httpClient.DefaultRequestHeaders.Add("User-Agent", "WikiFlight/1.0-dev (https://github.com/Ellecn/WikiFlight)");
         }
 
-        public async Task<List<WikipediaPage>> GetPagesNearby(string languageCode, Position position, int radius, int limit = 50)
+        public async Task<List<WikipediaPage>> GetPagesNearby(string languageCode, Position position, int radiusInMeter)
+        {
+            var pagesNearby = await GetPages(languageCode, position, radiusInMeter);
+
+            cache.AddNewPagesOnly(pagesNearby);
+
+            var pagesWithoutSummary = cache.GetPagesWithoutSummary(position, radiusInMeter);
+            if (pagesWithoutSummary.Count > 0)
+            {
+                await AddSummary(pagesWithoutSummary, languageCode);
+            }
+
+            return cache.Get(position, radiusInMeter);
+        }
+
+        private async Task<List<WikipediaPage>> GetPages(string languageCode, Position position, int radius, int limit = 50)
         {
             var url = string.Format(
                 "https://{0}.wikipedia.org/w/api.php?action=query&format=json&list=geosearch&gscoord={1}|{2}&gsradius={3}&gslimit={4}",
@@ -30,13 +45,11 @@ namespace WikipediaApi
             var t = httpClient.GetStreamAsync(url);
             var geoSearchResult = await JsonSerializer.DeserializeAsync<GeoSearchResult>(await t);
 
-            PositionOfLastRequest = position;
-
             var pageInfoList = geoSearchResult.GeoSearchQuery.PageInfoList;
             return pageInfoList.Select(pi => new WikipediaPage(pi.PageId, languageCode, pi.Title, new Position(pi.Latitude, pi.Longitude))).ToList();
         }
 
-        public async Task<List<WikipediaPage>> AddSummary(List<WikipediaPage> pages, string languageCode)
+        private async Task<List<WikipediaPage>> AddSummary(List<WikipediaPage> pages, string languageCode)
         {
             if (pages.Count == 0)
             {
