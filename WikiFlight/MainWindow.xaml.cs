@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 using System.Windows.Threading;
 using WikiFlight.Common;
 using WikiFlight.MSFS2020;
@@ -17,21 +18,22 @@ namespace WikiFlight
     public partial class MainWindow : Window
     {
         private readonly int REFRESH_INTERVAL_IN_SECONDS = 10;
-        private readonly int SEARCH_RADIUS_IN_METER = 5000;
-        private readonly string WIKIPEDIA_LANGUAGE_CODE = "de";
 
         private readonly LogWindow logWindow = new LogWindow();
 
         private readonly FlightSimulatorService flightSimulatorClient;
         private readonly WikipediaService wikipediaClient = new WikipediaService();
-        
+
         private readonly DispatcherTimer PositionRefreshTimer = new DispatcherTimer();
 
         private Position? positionOfLastRequest;
 
+        private Settings settings = new Settings();
+
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = settings;
 
             Trace.Listeners.Add(new LogTraceListener(logWindow.txtLog));
 
@@ -79,6 +81,11 @@ namespace WikiFlight
             logWindow.Show();
         }
 
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start("explorer", string.Format("\"{0}\"", e.Uri.AbsoluteUri));
+        }
+
         private void PositionRefreshTimerTick(object sender, EventArgs e)
         {
             flightSimulatorClient.RequestNewPosition();
@@ -110,7 +117,7 @@ namespace WikiFlight
         {
             if (positionOfLastRequest == null || currentPosition.GetDistance(positionOfLastRequest) > 10)
             {
-                var pagesNearby = await wikipediaClient.GetPagesNearby(WIKIPEDIA_LANGUAGE_CODE, currentPosition, SEARCH_RADIUS_IN_METER);
+                var pagesNearby = await wikipediaClient.GetPagesNearby(settings.WikipediaLanguageCode, currentPosition, settings.SearchRadiusInMeter);
                 positionOfLastRequest = currentPosition;
 
                 lstPages.Items.Clear();
@@ -124,6 +131,8 @@ namespace WikiFlight
 
             btnDisconnect.IsEnabled = connected;
             btnConnect.IsEnabled = !connected;
+            cmbLanguageCode.IsEnabled = !connected;
+            cmbRadius.IsEnabled = !connected;
             if (!connected)
             {
                 txtLatitude.Text = "n/a";

@@ -27,13 +27,13 @@ namespace WikiFlight.Wikipedia
 
             cache.AddNewPagesOnly(pagesNearby);
 
-            var pagesWithoutSummary = cache.GetPagesWithoutSummary(position, radiusInMeter);
+            var pagesWithoutSummary = cache.GetPagesWithoutSummary(languageCode, position, radiusInMeter);
             if (pagesWithoutSummary.Count > 0)
             {
                 await AddSummary(pagesWithoutSummary, languageCode);
             }
 
-            return cache.Get(position, radiusInMeter);
+            return cache.Get(languageCode, position, radiusInMeter);
         }
 
         private async Task<List<WikipediaPage>> GetPages(string languageCode, Position position, int radius, int limit = 50)

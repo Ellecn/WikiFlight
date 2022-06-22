@@ -14,16 +14,16 @@ namespace WikiFlight.Wikipedia
             this.pages.AddRange(newPages);
         }
 
-        public List<WikipediaPage> Get(Position currentPosition, int radius)
+        public List<WikipediaPage> Get(string languageCode, Position currentPosition, int radius)
         {
-            var pagesNearby = pages.Where(p => currentPosition.GetDistance(p.Position) <= radius).ToList();
+            var pagesNearby = pages.Where(p => p.LanguageCode.Equals(languageCode) && currentPosition.GetDistance(p.Position) <= radius).ToList();
             pagesNearby.ForEach(p => p.Distance = currentPosition.GetDistance(p.Position));
             return pagesNearby.OrderBy(p => p.Distance).ToList();
         }
 
-        public List<WikipediaPage> GetPagesWithoutSummary(Position currentPosition, int radius, int limit = 50)
+        public List<WikipediaPage> GetPagesWithoutSummary(string languageCode, Position currentPosition, int radius, int limit = 50)
         {
-            return Get(currentPosition, radius).Where(p => string.IsNullOrEmpty(p.Summary)).Take(limit).ToList();
+            return Get(languageCode, currentPosition, radius).Where(p => string.IsNullOrEmpty(p.Summary)).Take(limit).ToList();
         }
 
         /// <summary>
