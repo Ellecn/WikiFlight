@@ -1,12 +1,13 @@
-﻿using Common;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using WikipediaApi;
+using WikiFlight.Common;
+using WikiFlight.MSFS2020;
+using WikiFlight.Wikipedia;
 
 namespace WikiFlight
 {
@@ -21,8 +22,9 @@ namespace WikiFlight
 
         private readonly LogWindow logWindow = new LogWindow();
 
-        private readonly FlightSimulatorClient flightSimulatorClient;
-        private readonly WikipediaClient wikipediaClient = new WikipediaClient();
+        private readonly FlightSimulatorService flightSimulatorClient;
+        private readonly WikipediaService wikipediaClient = new WikipediaService();
+        
         private readonly DispatcherTimer PositionRefreshTimer = new DispatcherTimer();
 
         private Position? positionOfLastRequest;
@@ -33,7 +35,7 @@ namespace WikiFlight
 
             Trace.Listeners.Add(new LogTraceListener(logWindow.txtLog));
 
-            flightSimulatorClient = new FlightSimulatorClient(OnConnected, OnPositionReceived, OnSimExited);
+            flightSimulatorClient = new FlightSimulatorService(OnConnected, OnPositionReceived, OnSimExited);
 
             SetUi();
 

@@ -1,6 +1,6 @@
-﻿using Common;
+﻿using WikiFlight.Common;
 
-namespace WikipediaApi
+namespace WikiFlight.Wikipedia
 {
     public class WikipediaPage
     {

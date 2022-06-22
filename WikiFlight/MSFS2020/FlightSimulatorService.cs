@@ -1,14 +1,14 @@
-﻿using Common;
-using Microsoft.FlightSimulator.SimConnect;
+﻿using Microsoft.FlightSimulator.SimConnect;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using WikiFlight.Common;
 
-namespace WikiFlight
+namespace WikiFlight.MSFS2020
 {
-    public class FlightSimulatorClient
+    public class FlightSimulatorService
     {
         private const int WM_USER_SIMCONNECT = 0x402;
         private IntPtr windowHandle;
@@ -23,7 +23,7 @@ namespace WikiFlight
         public delegate void SimExitedHandler();
         private readonly SimExitedHandler OnSimExited;
 
-        public FlightSimulatorClient(ConnectedHandler onConnected, PositionReceivedHandler onPositionReceived, SimExitedHandler onSimExited)
+        public FlightSimulatorService(ConnectedHandler onConnected, PositionReceivedHandler onPositionReceived, SimExitedHandler onSimExited)
         {
             OnConnected = onConnected;
             OnPositionReceived = onPositionReceived;

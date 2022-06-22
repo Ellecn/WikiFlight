@@ -1,18 +1,22 @@
-﻿using Common;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+using WikiFlight.Common;
 
-namespace WikipediaApi
+namespace WikiFlight.Wikipedia
 {
-    public class WikipediaClient
+    public class WikipediaService
     {
         private readonly WikipediaPageCache cache = new WikipediaPageCache();
 
         private readonly HttpClient httpClient = new HttpClient();
 
-        public WikipediaClient()
+        public WikipediaService()
         {
             httpClient.DefaultRequestHeaders.Add("User-Agent", "WikiFlight/1.0-dev (https://github.com/Ellecn/WikiFlight)");
         }

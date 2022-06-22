@@ -3,11 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WikiFlight", "WikiFlight\WikiFlight.csproj", "{973F16D8-31C3-4F94-AF24-2492E5AE729E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WikipediaApi", "WikipediaApi\WikipediaApi.csproj", "{E5C27C03-A8F3-4817-9D1A-9EDD7235506E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{EB8699F9-0037-4480-BF1A-DB22FADD92E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikiFlight", "WikiFlight\WikiFlight.csproj", "{973F16D8-31C3-4F94-AF24-2492E5AE729E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +15,6 @@ Global
 		{973F16D8-31C3-4F94-AF24-2492E5AE729E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{973F16D8-31C3-4F94-AF24-2492E5AE729E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{973F16D8-31C3-4F94-AF24-2492E5AE729E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E5C27C03-A8F3-4817-9D1A-9EDD7235506E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E5C27C03-A8F3-4817-9D1A-9EDD7235506E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E5C27C03-A8F3-4817-9D1A-9EDD7235506E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E5C27C03-A8F3-4817-9D1A-9EDD7235506E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EB8699F9-0037-4480-BF1A-DB22FADD92E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EB8699F9-0037-4480-BF1A-DB22FADD92E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EB8699F9-0037-4480-BF1A-DB22FADD92E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EB8699F9-0037-4480-BF1A-DB22FADD92E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

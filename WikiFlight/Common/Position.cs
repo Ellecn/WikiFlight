@@ -1,4 +1,6 @@
-﻿namespace Common
+﻿using System;
+
+namespace WikiFlight.Common
 {
     public class Position
     {
