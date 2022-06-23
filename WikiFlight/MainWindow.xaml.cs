@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -16,18 +15,22 @@ namespace WikiFlight
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly int REFRESH_INTERVAL_IN_SECONDS = 10;
+        private readonly int POSITION_REQUEST_INTERVAL_IN_SECONDS = 1;
 
         private readonly LogWindow logWindow = new LogWindow();
 
-        private readonly FlightSimulatorService flightSimulatorService; // TODO: umbenennen
-        private readonly WikipediaService wikipediaService = new WikipediaService(); // TODO: umbenennen
+        private readonly FlightSimulatorService flightSimulatorService;
+        private readonly WikipediaService wikipediaService = new WikipediaService();
 
-        private readonly DispatcherTimer PositionRefreshTimer = new DispatcherTimer();
+        private readonly WikipediaPageCache wikipediaPageCache = new WikipediaPageCache();
 
-        private Position? positionOfLastRequest;
+        private readonly DispatcherTimer PositionRequestTimer = new DispatcherTimer();
+        private readonly DispatcherTimer PageRefreshTimer = new DispatcherTimer();
 
         private readonly Settings settings = new Settings();
+
+        public Position? CurrentPosition { get; set; }
+        public Position? LastPosition { get; set; }
 
         public MainWindow()
         {
@@ -40,8 +43,8 @@ namespace WikiFlight
 
             SetUi();
 
-            PositionRefreshTimer.Interval = TimeSpan.FromSeconds(REFRESH_INTERVAL_IN_SECONDS);
-            PositionRefreshTimer.Tick += PositionRefreshTimerTick;
+            PositionRequestTimer.Interval = TimeSpan.FromSeconds(POSITION_REQUEST_INTERVAL_IN_SECONDS);
+            PositionRequestTimer.Tick += PositionRequestTimerTick;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -91,9 +94,9 @@ namespace WikiFlight
             }
         }
 
-        private void PositionRefreshTimerTick(object sender, EventArgs e)
+        private void PositionRequestTimerTick(object sender, EventArgs e)
         {
-            flightSimulatorService.RequestNewPosition();
+            flightSimulatorService.RequestCurrentPosition();
         }
 
         private void Connect()
@@ -101,7 +104,7 @@ namespace WikiFlight
             try
             {
                 flightSimulatorService.Connect();
-                flightSimulatorService.RequestNewPosition();
+                flightSimulatorService.RequestCurrentPosition();
             }
             catch (Exception exception)
             {
@@ -111,23 +114,13 @@ namespace WikiFlight
 
         private void Disconnect()
         {
-            PositionRefreshTimer.Stop();
+            PositionRequestTimer.Stop();
+            PageRefreshTimer.Stop();
             flightSimulatorService.Disconnect();
-            positionOfLastRequest = null;
+            LastPosition = null;
+            CurrentPosition = null;
             lstPages.Items.Clear();
             SetUi();
-        }
-
-        private async Task Refresh(Position currentPosition)
-        {
-            if (positionOfLastRequest == null || currentPosition.GetDistance(positionOfLastRequest) > 10)
-            {
-                var pagesNearby = await wikipediaService.GetPagesNearby(settings.WikipediaLanguageCode, currentPosition, settings.SearchRadiusInMeter);
-                positionOfLastRequest = currentPosition;
-
-                lstPages.Items.Clear();
-                pagesNearby.ForEach(p => lstPages.Items.Add(p));
-            }
         }
 
         private void SetUi()
@@ -149,16 +142,29 @@ namespace WikiFlight
 
         private void OnConnected()
         {
-            PositionRefreshTimer.Start();
+            PositionRequestTimer.Start();
+            PageRefreshTimer.Start();
             SetUi();
         }
 
         private async void OnPositionReceived(Position currentPosition)
         {
-            txtLatitude.Text = currentPosition.Latitude.ToString();
-            txtLongitude.Text = currentPosition.Longitude.ToString();
+            CurrentPosition = currentPosition;
+            txtLatitude.Text = CurrentPosition.Latitude.ToString();
+            txtLongitude.Text = CurrentPosition.Longitude.ToString();
 
-            await Refresh(currentPosition);
+            if (LastPosition == null || CurrentPosition.GetDistance(LastPosition) > 1000)
+            {
+                var pages = await wikipediaService.GetPages(settings.WikipediaLanguageCode, CurrentPosition, 10000);
+
+                wikipediaPageCache.AddNewPagesOnly(pages);
+                var pagesNearby = wikipediaPageCache.Get(settings.WikipediaLanguageCode, CurrentPosition, settings.SearchRadiusInMeter);
+
+                LastPosition = CurrentPosition;
+
+                lstPages.Items.Clear();
+                pagesNearby.ForEach(p => lstPages.Items.Add(p));
+            }
         }
 
         private void OnSimExited()

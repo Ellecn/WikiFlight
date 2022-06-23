@@ -2,6 +2,9 @@
 
 namespace WikiFlight.Common
 {
+    /// <summary>
+    /// Position on earth defined by coordinates (latitude and longitude).
+    /// </summary>
     public class Position
     {
         public Position(double latitude, double longitude)
@@ -14,6 +17,11 @@ namespace WikiFlight.Common
 
         public double Longitude { get; }
 
+        /// <summary>
+        /// Calculates distance to other position
+        /// </summary>
+        /// <param name="other">Other position</param>
+        /// <returns>Distance in meter</returns>
         public double GetDistance(Position other)
         {
             var d1 = Latitude * (Math.PI / 180.0);

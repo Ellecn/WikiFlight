@@ -3,6 +3,9 @@ using WikiFlight.Common;
 
 namespace WikiFlight.Wikipedia
 {
+    /// <summary>
+    /// A wikipadia page.
+    /// </summary>
     public class WikipediaPage : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;

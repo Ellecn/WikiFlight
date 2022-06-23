@@ -21,11 +21,6 @@ namespace WikiFlight.Wikipedia
             return pagesNearby.OrderBy(p => p.Distance).ToList();
         }
 
-        public List<WikipediaPage> GetPagesWithoutSummary(string languageCode, Position currentPosition, int radius, int limit = 50)
-        {
-            return Get(languageCode, currentPosition, radius).Where(p => string.IsNullOrEmpty(p.Summary)).Take(limit).ToList();
-        }
-
         /// <summary>
         /// Removes all pages that are within radius (meter) of the current position.
         /// </summary>

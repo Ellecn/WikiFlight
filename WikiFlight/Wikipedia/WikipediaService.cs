@@ -12,8 +12,6 @@ namespace WikiFlight.Wikipedia
 {
     public class WikipediaService
     {
-        private readonly WikipediaPageCache cache = new WikipediaPageCache();
-
         private readonly HttpClient httpClient = new HttpClient();
 
         public WikipediaService()
@@ -21,21 +19,22 @@ namespace WikiFlight.Wikipedia
             httpClient.DefaultRequestHeaders.Add("User-Agent", "WikiFlight/1.0-dev (https://github.com/Ellecn/WikiFlight)");
         }
 
-        public async Task<List<WikipediaPage>> GetPagesNearby(string languageCode, Position position, int radiusInMeter)
-        {
-            var pagesNearby = await GetPages(languageCode, position, radiusInMeter);
-            cache.AddNewPagesOnly(pagesNearby);
-            return cache.Get(languageCode, position, radiusInMeter);
-        }
-
-        private async Task<List<WikipediaPage>> GetPages(string languageCode, Position position, int radius, int limit = 50)
+        /// <summary>
+        /// Gets Wikipedia pages in specified search area
+        /// </summary>
+        /// <param name="languageCode">Wikipedia language code</param>
+        /// <param name="position">Center of search area</param>
+        /// <param name="radius">Search radius in meter (between 0 and 10000)</param>
+        /// <param name="limit"></param>
+        /// <returns>List of Wikipedia pages</returns>
+        public async Task<List<WikipediaPage>> GetPages(string languageCode, Position position, int radius, int limit = 50) // TODO: mit limit spielen. Wie viel geht?
         {
             var url = string.Format(
                 "https://{0}.wikipedia.org/w/api.php?action=query&format=json&list=geosearch&gscoord={1}|{2}&gsradius={3}&gslimit={4}",
                 languageCode,
                 position.Latitude.ToString("00.0000", CultureInfo.CreateSpecificCulture("en-GB")),
                 position.Longitude.ToString("00.0000", CultureInfo.CreateSpecificCulture("en-GB")),
-                radius,
+                radius <= 10000 ? radius : 10000,
                 limit);
             Trace.WriteLine("GET " + url);
             var t = httpClient.GetStreamAsync(url);
