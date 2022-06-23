@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Navigation;
 using System.Windows.Threading;
 using WikiFlight.Common;
 using WikiFlight.MSFS2020;
@@ -90,12 +89,6 @@ namespace WikiFlight
                 string? summary = await wikipediaService.GetSummary(wikipediaPage);
                 wikipediaPage.Summary = summary ?? "";
             }
-        }
-
-        private void CheckBoxAlwaysOnTop_Changed(object sender, RoutedEventArgs e)
-        {
-            CheckBox checkBox = (CheckBox)sender;
-            Topmost = checkBox.IsChecked ?? false;
         }
 
         private void PositionRefreshTimerTick(object sender, EventArgs e)
