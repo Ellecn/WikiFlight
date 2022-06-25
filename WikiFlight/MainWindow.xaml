@@ -89,14 +89,10 @@
                 <DataTemplate>
                     <Expander Expanded="ListViewExpander_Expanded">
                         <Expander.Header>
-                            <TextBlock TextWrapping="Wrap" FontWeight="Bold">
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="{}{0} [{1}m away]">
-                                        <Binding Path="Title" />
-                                        <Binding Path="Distance" />
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock DockPanel.Dock="Left" TextWrapping="Wrap" FontWeight="Bold" Text="{Binding Path=Title}" />
+                                <TextBlock DockPanel.Dock="Right" Margin="4 0 0 0" Text="{Binding Path=Distance, StringFormat=({0}m away)}" />
+                            </StackPanel>
                         </Expander.Header>
                         <TextBlock Text="{Binding Path=Summary}" TextWrapping="Wrap" MaxHeight="80" TextTrimming="CharacterEllipsis" />
                     </Expander>
