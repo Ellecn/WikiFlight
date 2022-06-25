@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -13,6 +14,9 @@ namespace WikiFlight.Wikipedia
     public class WikipediaService
     {
         private readonly HttpClient httpClient = new HttpClient();
+
+        private Position? positionOfLastPageRequest;
+        private DateTime? timeStampOfLastPageRequest;
 
         public WikipediaService()
         {
@@ -29,6 +33,9 @@ namespace WikiFlight.Wikipedia
         /// <returns>List of Wikipedia pages</returns>
         public async Task<List<WikipediaPage>> GetPages(string languageCode, Position position, int radius, int limit = 50) // TODO: mit limit spielen. Wie viel geht?
         {
+            positionOfLastPageRequest = position;
+            timeStampOfLastPageRequest = DateTime.Now;
+
             var url = string.Format(
                 "https://{0}.wikipedia.org/w/api.php?action=query&format=json&list=geosearch&gscoord={1}|{2}&gsradius={3}&gslimit={4}",
                 languageCode,
@@ -42,6 +49,22 @@ namespace WikiFlight.Wikipedia
 
             var pageInfoList = geoSearchResult.GeoSearchQuery.PageInfoList;
             return pageInfoList.Select(pi => new WikipediaPage(pi.PageId, languageCode, pi.Title, new Position(pi.Latitude, pi.Longitude))).ToList();
+        }
+
+        public Position? GetPositionOfLastPageRequest()
+        {
+            return positionOfLastPageRequest;
+        }
+
+        public DateTime? GetTimeStampOfLastPageRequest()
+        {
+            return timeStampOfLastPageRequest;
+        }
+
+        public void Reset()
+        {
+            positionOfLastPageRequest = null;
+            timeStampOfLastPageRequest = null;
         }
 
         public async Task<string?> GetSummary(WikipediaPage wikipediaPage)

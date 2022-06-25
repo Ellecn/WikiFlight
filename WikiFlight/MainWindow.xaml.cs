@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
@@ -24,13 +25,9 @@ namespace WikiFlight
 
         private readonly WikipediaPageCache wikipediaPageCache = new WikipediaPageCache();
 
-        private readonly DispatcherTimer PositionRequestTimer = new DispatcherTimer();
-        private readonly DispatcherTimer PageRefreshTimer = new DispatcherTimer();
+        private readonly DispatcherTimer PositionRefreshTimer = new DispatcherTimer();
 
         private readonly Settings settings = new Settings();
-
-        public Position? CurrentPosition { get; set; }
-        public Position? LastPosition { get; set; }
 
         public MainWindow()
         {
@@ -43,8 +40,8 @@ namespace WikiFlight
 
             SetUi();
 
-            PositionRequestTimer.Interval = TimeSpan.FromSeconds(POSITION_REQUEST_INTERVAL_IN_SECONDS);
-            PositionRequestTimer.Tick += PositionRequestTimerTick;
+            PositionRefreshTimer.Interval = TimeSpan.FromSeconds(POSITION_REQUEST_INTERVAL_IN_SECONDS);
+            PositionRefreshTimer.Tick += PositionRequestTimerTick;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -94,7 +91,7 @@ namespace WikiFlight
             }
         }
 
-        private void PositionRequestTimerTick(object sender, EventArgs e)
+        private void PositionRequestTimerTick(object? sender, EventArgs e)
         {
             flightSimulatorService.RequestCurrentPosition();
         }
@@ -114,11 +111,9 @@ namespace WikiFlight
 
         private void Disconnect()
         {
-            PositionRequestTimer.Stop();
-            PageRefreshTimer.Stop();
+            PositionRefreshTimer.Stop();
             flightSimulatorService.Disconnect();
-            LastPosition = null;
-            CurrentPosition = null;
+            wikipediaService.Reset();
             lstPages.Items.Clear();
             SetUi();
         }
@@ -142,29 +137,38 @@ namespace WikiFlight
 
         private void OnConnected()
         {
-            PositionRequestTimer.Start();
-            PageRefreshTimer.Start();
+            PositionRefreshTimer.Start();
             SetUi();
         }
 
         private async void OnPositionReceived(Position currentPosition)
         {
-            CurrentPosition = currentPosition;
-            txtLatitude.Text = CurrentPosition.Latitude.ToString();
-            txtLongitude.Text = CurrentPosition.Longitude.ToString();
+            txtLatitude.Text = currentPosition.Latitude.ToString();
+            txtLongitude.Text = currentPosition.Longitude.ToString();
 
-            if (LastPosition == null || CurrentPosition.GetDistance(LastPosition) > 1000)
+            if (ShouldLoadNewWikipediaPages(currentPosition))
             {
-                var pages = await wikipediaService.GetPages(settings.WikipediaLanguageCode, CurrentPosition, 10000);
-
+                var pages = await wikipediaService.GetPages(settings.WikipediaLanguageCode, currentPosition, 10000);
                 wikipediaPageCache.AddNewPagesOnly(pages);
-                var pagesNearby = wikipediaPageCache.Get(settings.WikipediaLanguageCode, CurrentPosition, settings.SearchRadiusInMeter);
+            }
 
-                LastPosition = CurrentPosition;
-
+            var pagesNearby = wikipediaPageCache.Get(settings.WikipediaLanguageCode, currentPosition, settings.SearchRadiusInMeter);
+            if (!AreTheSame(pagesNearby, lstPages.Items))
+            {
                 lstPages.Items.Clear();
                 pagesNearby.ForEach(p => lstPages.Items.Add(p));
             }
+        }
+
+        private bool ShouldLoadNewWikipediaPages(Position currentPosition)
+        {
+            return wikipediaService.GetPositionOfLastPageRequest() == null
+                || (currentPosition.GetDistance(wikipediaService.GetPositionOfLastPageRequest()) > 1000 && DateTime.Now.Subtract(wikipediaService.GetTimeStampOfLastPageRequest().Value) > TimeSpan.FromSeconds(3));
+        }
+
+        private static bool AreTheSame(List<WikipediaPage> list, ItemCollection itemCollection)
+        {
+            return list.Count == itemCollection.Count && list.TrueForAll(p => itemCollection.Contains(p));
         }
 
         private void OnSimExited()
