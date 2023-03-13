@@ -9,9 +9,9 @@ using WikiFlight.Common;
 namespace WikiFlight.MSFS2020
 {
     /// <summary>
-    /// Service that connects to and reads values from Microsoft Flight Simulator 2020.
+    /// Connection to Microsoft Flight Simulator 2020.
     /// </summary>
-    public class FlightSimulatorService
+    public class FlightSimulatorConnection
     {
         private const int WM_USER_SIMCONNECT = 0x402;
         private IntPtr windowHandle;
@@ -32,7 +32,7 @@ namespace WikiFlight.MSFS2020
         /// <param name="onConnected">Event handler that is called when a connection to the simulator is established.</param>
         /// <param name="onPositionReceived">Event handler that is called when new position data from the simualtor is received.</param>
         /// <param name="onSimExited">Event handler that is called when the connection to the simulator is lost.</param>
-        public FlightSimulatorService(ConnectedHandler onConnected, PositionReceivedHandler onPositionReceived, SimExitedHandler onSimExited)
+        public FlightSimulatorConnection(ConnectedHandler onConnected, PositionReceivedHandler onPositionReceived, SimExitedHandler onSimExited)
         {
             OnConnected = onConnected;
             OnPositionReceived = onPositionReceived;

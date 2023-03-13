@@ -6,7 +6,7 @@ namespace WikiFlight.Wikipedia
 {
     public class WikipediaPageCache
     {
-        private List<WikipediaPage> pages = new List<WikipediaPage>();
+        private readonly List<WikipediaPage> pages = new List<WikipediaPage>();
 
         public void AddNewPagesOnly(List<WikipediaPage> pages)
         {
