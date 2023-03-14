@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WikiFlight"
+        xmlns:map="clr-namespace:WikiFlight.Controls.FlightMap"
         mc:Ignorable="d"
         Title="WikiFlight" Height="800" Width="400" x:Name="mainWindow">
     <Grid>
@@ -13,9 +14,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -68,39 +67,44 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
         </Grid>
-        <Separator Grid.Row="5" />
-        <ListView Grid.Row="6" SelectionMode="Single" BorderThickness="0" x:Name="lstPages" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="lstPages_SelectionChanged">
-            <ListView.Style>
-                <Style TargetType="ListView">
-                    <Style.Triggers>
-                        <Trigger Property="HasItems" Value="False">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListView">
-                                        <TextBlock Margin="4" Text="No things nearby..."/>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ListView.Style>
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Expander Expanded="ListViewExpander_Expanded">
-                        <Expander.Header>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock DockPanel.Dock="Left" TextWrapping="Wrap" FontWeight="Bold" Text="{Binding Path=Title}" />
-                                <TextBlock DockPanel.Dock="Right" Margin="4 0 0 0" Text="{Binding Path=Distance, StringFormat=({0}m away)}" />
-                            </StackPanel>
-                        </Expander.Header>
-                        <TextBlock Text="{Binding Path=Summary}" TextWrapping="Wrap" MaxHeight="80" TextTrimming="CharacterEllipsis" />
-                    </Expander>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        <Separator Grid.Row="7" />
-        <Grid Grid.Row="8" >
+        <TabControl Grid.Row="5">
+            <TabItem Header="List" Name="tabList">
+                <ListView SelectionMode="Single" BorderThickness="0" x:Name="lstPages" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="lstPages_SelectionChanged">
+                    <ListView.Style>
+                        <Style TargetType="ListView">
+                            <Style.Triggers>
+                                <Trigger Property="HasItems" Value="False">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListView">
+                                                <TextBlock Margin="4" Text="No things nearby..."/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.Style>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Expander Expanded="ListViewExpander_Expanded">
+                                <Expander.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock DockPanel.Dock="Left" TextWrapping="Wrap" FontWeight="Bold" Text="{Binding Path=Title}" />
+                                        <TextBlock DockPanel.Dock="Right" Margin="4 0 0 0" Text="{Binding Path=Distance, StringFormat=({0}m away)}" />
+                                    </StackPanel>
+                                </Expander.Header>
+                                <TextBlock Text="{Binding Path=Summary}" TextWrapping="Wrap" MaxHeight="80" TextTrimming="CharacterEllipsis" />
+                            </Expander>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </TabItem>
+            <TabItem Header="Map" Name="tabMap" IsSelected="True">
+                <map:FlightMap x:Name="flightMap" />
+            </TabItem>
+        </TabControl>
+        <Grid Grid.Row="6" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />

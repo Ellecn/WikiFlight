@@ -8,10 +8,14 @@ namespace WikiFlight.Wikipedia
     {
         private readonly List<WikipediaPage> pages = new List<WikipediaPage>();
 
+        private IEnumerable<WikipediaPage> GetNewPagesOnly(List<WikipediaPage> pages)
+        {
+            return pages.Where(p => !this.pages.Any(pp => p.PageId == pp.PageId && p.LanguageCode.Equals(pp.LanguageCode)));
+        }
+
         public void AddNewPagesOnly(List<WikipediaPage> pages)
         {
-            var newPages = pages.Where(p => !this.pages.Any(pp => p.PageId == pp.PageId && p.LanguageCode.Equals(pp.LanguageCode)));
-            this.pages.AddRange(newPages);
+            this.pages.AddRange(GetNewPagesOnly(pages));
         }
 
         public List<WikipediaPage> Get(string languageCode, Position currentPosition, int radius)

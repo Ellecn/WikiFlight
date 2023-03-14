@@ -113,6 +113,7 @@ namespace WikiFlight
             flightSimulatorConnection.Disconnect();
             wikipediaService.Reset();
             lstPages.Items.Clear();
+            flightMap.clearMarkers();
             SetUi();
         }
 
@@ -146,10 +147,19 @@ namespace WikiFlight
 
             var pagesNearby = await wikipediaService.GetPagesNearby(settings.WikipediaLanguageCode, currentPosition, settings.SearchRadiusInMeter);
 
-            if (!AreTheSame(pagesNearby, lstPages.Items))
+            if (tabList.IsSelected)
             {
-                lstPages.Items.Clear();
-                pagesNearby.ForEach(p => lstPages.Items.Add(p));
+                if (!AreTheSame(pagesNearby, lstPages.Items))
+                {
+                    lstPages.Items.Clear();
+                    pagesNearby.ForEach(p => lstPages.Items.Add(p));
+                }
+            }
+
+            if (tabMap.IsSelected)
+            {
+                flightMap.setCircle(currentPosition, settings.SearchRadiusInMeter);
+                flightMap.addNewMarkers(pagesNearby);
             }
         }
 
