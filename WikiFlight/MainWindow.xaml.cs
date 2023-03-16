@@ -14,13 +14,13 @@ namespace WikiFlight
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IFlightSimulatorEventListener
     {
         private readonly int POSITION_REQUEST_INTERVAL_IN_SECONDS = 1;
 
         private readonly LogWindow logWindow = new LogWindow();
 
-        private readonly FlightSimulatorConnection flightSimulatorConnection;
+        private FlightSimulatorConnection flightSimulatorConnection;
 
         private readonly WikipediaService wikipediaService = new WikipediaService();
 
@@ -35,7 +35,7 @@ namespace WikiFlight
 
             Trace.Listeners.Add(new LogTraceListener(logWindow.txtLog));
 
-            flightSimulatorConnection = new FlightSimulatorConnection(OnConnected, OnPositionReceived, OnSimExited);
+            flightSimulatorConnection = new MSFS2020Connection(this);
 
             SetUi();
 
@@ -93,8 +93,12 @@ namespace WikiFlight
         {
             try
             {
-                flightSimulatorConnection.Connect(settings.SimulatorConnector);
-                flightSimulatorConnection.RequestCurrentPosition();
+                if (flightSimulatorConnection.GetType() != settings.SimulatorConnectionType)
+                {
+                    flightSimulatorConnection.Disconnect();
+                    flightSimulatorConnection = Activator.CreateInstance(settings.SimulatorConnectionType, this) as FlightSimulatorConnection;
+                }
+                flightSimulatorConnection.Connect();
             }
             catch (Exception exception)
             {
@@ -128,20 +132,20 @@ namespace WikiFlight
             }
         }
 
-        #region FlightSimulatorClient event handlers
+        #region IFlightSimulatorEventListener implementation
 
-        private void OnConnected()
+        public void OnConnected()
         {
             PositionRefreshTimer.Start();
             SetUi();
         }
 
-        private async void OnPositionReceived(Position currentPosition)
+        public async void OnPositionReceived(Position position)
         {
-            txtLatitude.Text = currentPosition.Latitude.ToString();
-            txtLongitude.Text = currentPosition.Longitude.ToString();
+            txtLatitude.Text = position.Latitude.ToString();
+            txtLongitude.Text = position.Longitude.ToString();
 
-            var pagesNearby = await wikipediaService.GetPagesNearby(settings.WikipediaLanguageCode, currentPosition, settings.SearchRadiusInMeter);
+            var pagesNearby = await wikipediaService.GetPagesNearby(settings.WikipediaLanguageCode, position, settings.SearchRadiusInMeter);
 
             if (tabList.IsSelected)
             {
@@ -154,21 +158,21 @@ namespace WikiFlight
 
             if (tabMap.IsSelected)
             {
-                flightMap.setCircle(currentPosition, settings.SearchRadiusInMeter);
+                flightMap.setCircle(position, settings.SearchRadiusInMeter);
                 flightMap.addNewMarkers(pagesNearby);
             }
         }
 
-        private static bool AreTheSame(List<WikipediaPage> list, ItemCollection itemCollection)
-        {
-            return list.Count == itemCollection.Count && list.TrueForAll(p => itemCollection.Contains(p));
-        }
-
-        private void OnSimExited()
+        public void OnSimExited()
         {
             Disconnect();
         }
 
         #endregion
+
+        private static bool AreTheSame(List<WikipediaPage> list, ItemCollection itemCollection)
+        {
+            return list.Count == itemCollection.Count && list.TrueForAll(p => itemCollection.Contains(p));
+        }
     }
 }

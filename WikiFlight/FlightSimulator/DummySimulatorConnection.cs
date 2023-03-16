@@ -1,19 +1,18 @@
 ﻿using System.Diagnostics;
 using WikiFlight.Common;
-using WikiFlight.MSFS2020;
 
 namespace WikiFlight.FlightSimulator
 {
     /// <summary>
-    /// Connector for a dummy simulator
+    /// Connection for a dummy simulator
     /// </summary>
-    public class DummyConnector : FlightSimulatorConnector
+    public class DummySimulatorConnection : FlightSimulatorConnection
     {
         private bool connected = false;
 
         private Position currentPosition;
 
-        public DummyConnector(FlightSimulatorConnection flightSimulatorConnection) : base(flightSimulatorConnection)
+        public DummySimulatorConnection(IFlightSimulatorEventListener flightSimulatorEventListener) : base(flightSimulatorEventListener)
         {
             currentPosition = new Position(54.153131, 13.778811);
         }
@@ -29,7 +28,7 @@ namespace WikiFlight.FlightSimulator
             {
                 Trace.WriteLine("Connect to dummy simulator...");
                 connected = true;
-                flightSimulatorConnection.OnConnected();
+                flightSimulatorEventListener.OnConnected();
             }
             else
             {
@@ -55,7 +54,7 @@ namespace WikiFlight.FlightSimulator
                 currentPosition = new Position(currentPosition.Latitude - 0.001, currentPosition.Longitude - 0.001);
 
                 Trace.WriteLine(string.Format("New position data received: {0}|{1}", currentPosition.Latitude, currentPosition.Longitude));
-                flightSimulatorConnection.OnPositionReceived(currentPosition);
+                flightSimulatorEventListener.OnPositionReceived(currentPosition);
             }
         }
     }

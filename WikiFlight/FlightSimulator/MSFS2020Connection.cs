@@ -5,20 +5,19 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using WikiFlight.Common;
-using WikiFlight.MSFS2020;
 
 namespace WikiFlight.FlightSimulator
 {
     /// <summary>
-    /// Connector for the MS Flight Simulator 2020
+    /// Connection to the MS Flight Simulator 2020
     /// </summary>
-    public class MSFS2020Connector : FlightSimulatorConnector
+    public class MSFS2020Connection : FlightSimulatorConnection
     {
         private const int WM_USER_SIMCONNECT = 0x402;
         private IntPtr windowHandle;
         private SimConnect? simConnect;
 
-        public MSFS2020Connector(FlightSimulatorConnection flightSimulatorConnection) : base(flightSimulatorConnection)
+        public MSFS2020Connection(IFlightSimulatorEventListener flightSimulatorEventListener) : base(flightSimulatorEventListener)
         {
             windowHandle = new WindowInteropHelper(Application.Current.MainWindow).EnsureHandle();
 
@@ -63,8 +62,8 @@ namespace WikiFlight.FlightSimulator
             {
                 simConnect.Dispose();
                 simConnect = null;
+                Trace.WriteLine("Disconnected from sim");
             }
-            Trace.WriteLine("Disconnected from sim");
         }
 
         public override void RequestCurrentPosition()
@@ -103,7 +102,7 @@ namespace WikiFlight.FlightSimulator
         private void OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
         {
             Trace.WriteLine("Connected to sim");
-            flightSimulatorConnection.OnConnected();
+            flightSimulatorEventListener.OnConnected();
         }
 
         private void OnRecvSimobjectDataBytype(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA_BYTYPE data)
@@ -114,7 +113,7 @@ namespace WikiFlight.FlightSimulator
 
                 Trace.WriteLine(string.Format("New position data received: {0}|{1}", requestedData.latitude, requestedData.longitude));
 
-                flightSimulatorConnection.OnPositionReceived(new Position(requestedData.latitude, requestedData.longitude));
+                flightSimulatorEventListener.OnPositionReceived(new Position(requestedData.latitude, requestedData.longitude));
             }
             //else
             //{
@@ -130,7 +129,7 @@ namespace WikiFlight.FlightSimulator
         private void OnRecvQuit(SimConnect sender, SIMCONNECT_RECV data)
         {
             Trace.WriteLine("Sim has exited");
-            flightSimulatorConnection.OnSimExited();
+            flightSimulatorEventListener.OnSimExited();
         }
 
         #region structs and enums

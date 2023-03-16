@@ -6,22 +6,22 @@ namespace WikiFlight
 {
     internal class Settings
     {
-        public Type SimulatorConnector { get; set; } = typeof(MSFS2020Connector);
+        public Type SimulatorConnectionType { get; set; } = typeof(MSFS2020Connection);
         public List<Simulator> SimulatorOptions { get; set; } = new List<Simulator>()
         {
-            new Simulator("MS Flight Simulator 2020", typeof(MSFS2020Connector)),
-            new Simulator("Dummy simulator", typeof(DummyConnector))
+            new Simulator("MS Flight Simulator 2020", typeof(MSFS2020Connection)),
+            new Simulator("Dummy simulator", typeof(DummySimulatorConnection))
         };
         internal class Simulator
         {
-            public Simulator(string name, Type connectorType)
+            public Simulator(string name, Type connectionType)
             {
                 Name = name;
-                ConnectorType = connectorType;
+                ConnectionType = connectionType;
             }
 
             public string Name { get; }
-            public Type ConnectorType { get; }
+            public Type ConnectionType { get; }
         }
 
         public int SearchRadiusInMeter { get; set; } = 3000;
