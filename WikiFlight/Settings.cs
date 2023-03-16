@@ -10,7 +10,7 @@ namespace WikiFlight
         public List<Simulator> SimulatorOptions { get; set; } = new List<Simulator>()
         {
             new Simulator("MS Flight Simulator 2020", typeof(MSFS2020Connector)),
-            new Simulator("Dummy", typeof(DummyConnector))
+            new Simulator("Dummy simulator", typeof(DummyConnector))
         };
         internal class Simulator
         {

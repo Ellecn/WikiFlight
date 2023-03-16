@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using WikiFlight.Common;
 using WikiFlight.FlightSimulator;
-using WikiFlight.MSFS2020;
 using WikiFlight.Wikipedia;
 
 namespace WikiFlight
@@ -22,6 +21,7 @@ namespace WikiFlight
         private readonly LogWindow logWindow = new LogWindow();
 
         private readonly FlightSimulatorConnection flightSimulatorConnection;
+
         private readonly WikipediaService wikipediaService = new WikipediaService();
 
         private readonly DispatcherTimer PositionRefreshTimer = new DispatcherTimer();
@@ -99,7 +99,6 @@ namespace WikiFlight
             catch (Exception exception)
             {
                 Trace.WriteLine(string.Format("Could not connect to simulator ({0})", exception.Message));
-                flightSimulatorConnection.Disconnect();
             }
         }
 

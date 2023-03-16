@@ -53,7 +53,8 @@ namespace WikiFlight.FlightSimulator
             }
             catch (Exception ex)
             {
-                Trace.WriteLine("Connector '" + connectorType + "' could not be created. (" + ex.Message + ")");
+                Trace.WriteLine(string.Format("Connector '{0}' could not be created. ({1})", connectorType, ex.Message));
+                Disconnect();
             }
         }
 
