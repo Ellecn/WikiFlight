@@ -1,4 +1,6 @@
-﻿using WikiFlight.Common;
+﻿using System;
+using WikiFlight.Common;
+using WikiFlight.FlightSimulator;
 
 namespace WikiFlight.MSFS2020
 {
@@ -7,14 +9,7 @@ namespace WikiFlight.MSFS2020
     /// </summary>
     public abstract class FlightSimulatorConnector
     {
-        public delegate void ConnectedHandler();
-        protected readonly ConnectedHandler OnConnected;
-
-        public delegate void PositionReceivedHandler(Position currentPosition);
-        protected readonly PositionReceivedHandler OnPositionReceived;
-
-        public delegate void SimExitedHandler();
-        protected readonly SimExitedHandler OnSimExited;
+        protected FlightSimulatorConnection flightSimulatorConnection;
 
         /// <summary>
         /// Creates a new FlightSimulatorConnector.
@@ -22,11 +17,9 @@ namespace WikiFlight.MSFS2020
         /// <param name="onConnected">Event handler that is called when a connection to a simulator is established.</param>
         /// <param name="onPositionReceived">Event handler that is called when new position data from a simualtor is received.</param>
         /// <param name="onSimExited">Event handler that is called when the connection to a simulator is lost.</param>
-        public FlightSimulatorConnector(ConnectedHandler onConnected, PositionReceivedHandler onPositionReceived, SimExitedHandler onSimExited)
+        public FlightSimulatorConnector(FlightSimulatorConnection flightSimulatorConnection)
         {
-            OnConnected = onConnected;
-            OnPositionReceived = onPositionReceived;
-            OnSimExited = onSimExited;
+            this.flightSimulatorConnection = flightSimulatorConnection;
         }
 
         /// <summary>

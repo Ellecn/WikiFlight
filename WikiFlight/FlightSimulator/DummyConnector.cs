@@ -11,7 +11,7 @@ namespace WikiFlight.FlightSimulator
     {
         private bool connected = false;
 
-        public DummyConnector(ConnectedHandler onConnected, PositionReceivedHandler onPositionReceived, SimExitedHandler onSimExited) : base(onConnected, onPositionReceived, onSimExited)
+        public DummyConnector(FlightSimulatorConnection flightSimulatorConnection) : base(flightSimulatorConnection)
         {
         }
 
@@ -24,9 +24,9 @@ namespace WikiFlight.FlightSimulator
         {
             if (!IsConnected())
             {
-                Trace.WriteLine("Connect to sim...");
+                Trace.WriteLine("Connect to dummy simulator...");
                 connected = true;
-                OnConnected();
+                flightSimulatorConnection.OnConnected();
             }
             else
             {
@@ -48,7 +48,8 @@ namespace WikiFlight.FlightSimulator
             if (IsConnected())
             {
                 Trace.WriteLine("New position data requested");
-                OnPositionReceived(new Position(54.153131, 13.778811));
+                Trace.WriteLine(string.Format("New position data received: {0}|{1}", 54.153131, 13.778811));
+                flightSimulatorConnection.OnPositionReceived(new Position(54.153131, 13.778811));
             }
         }
     }

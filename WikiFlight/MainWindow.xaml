@@ -13,47 +13,25 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Margin="4" Padding="8 2 8 2" x:Name="btnConnect" Click="btnConnect_Click">Connect to MSFS2020</Button>
-            <Button Grid.Column="1" Margin="4" Padding="8 2 8 2" x:Name="btnDisconnect" Click="btnDisconnect_Click">Disconnect from MSFS2020</Button>
-        </Grid>
-        <Separator Grid.Row="1" />
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" Margin="4">Latitude:</TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="0" Margin="4">Longitude:</TextBlock>
-            <TextBox Grid.Row="0" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLatitude">n/a</TextBox>
-            <TextBox Grid.Row="1" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLongitude">n/a</TextBox>
-        </Grid>
-        <Separator Grid.Row="3" />
-        <Grid Grid.Row="4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" Margin="4">Wikipedia language:</TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="0" Margin="4">Search radius:</TextBlock>
-            <ComboBox Grid.Row="0" Grid.Column="1" Margin="4 2 4 2" x:Name="cmbLanguageCode" ItemsSource="{Binding Path=WikipediaLanguageOptions}" DisplayMemberPath="Name" SelectedValuePath="Code" SelectedValue="{Binding Path=WikipediaLanguageCode}" />
-            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="cmbRadius" Margin="4 2 4 2" ItemsSource="{Binding Path=SearchRadiusInMeterOptions}" SelectedItem="{Binding Path=SearchRadiusInMeter}">
+            <TextBlock Grid.Row="0" Grid.Column="0" Margin="4">Simulator:</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="4">Wikipedia language:</TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="4">Search radius:</TextBlock>
+            <ComboBox Grid.Row="0" Grid.Column="1" Margin="4 2 4 2" Name="cmbSimulator" ItemsSource="{Binding Path=SimulatorOptions}" DisplayMemberPath="Name" SelectedValuePath="ConnectorType" SelectedValue="{Binding Path=SimulatorConnector}" />
+            <ComboBox Grid.Row="1" Grid.Column="1" Margin="4 2 4 2" Name="cmbLanguageCode" ItemsSource="{Binding Path=WikipediaLanguageOptions}" DisplayMemberPath="Name" SelectedValuePath="Code" SelectedValue="{Binding Path=WikipediaLanguageCode}" />
+            <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Name="cmbRadius" Margin="4 2 4 2" ItemsSource="{Binding Path=SearchRadiusInMeterOptions}" SelectedItem="{Binding Path=SearchRadiusInMeter}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock>
@@ -67,7 +45,30 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
         </Grid>
-        <TabControl Grid.Row="5">
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Margin="4" Padding="8 2 8 2" x:Name="btnConnect" Click="btnConnect_Click">Connect to simulator</Button>
+            <Button Grid.Column="1" Margin="4" Padding="8 2 8 2" x:Name="btnDisconnect" Click="btnDisconnect_Click">Disconnect from simulator</Button>
+        </Grid>
+        <Separator Grid.Row="2" />
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" Margin="4">Latitude:</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="4">Longitude:</TextBlock>
+            <TextBox Grid.Row="0" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLatitude">n/a</TextBox>
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLongitude">n/a</TextBox>
+        </Grid>
+        <TabControl Grid.Row="4">
             <TabItem Header="List" Name="tabList">
                 <ListView SelectionMode="Single" BorderThickness="0" x:Name="lstPages" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="lstPages_SelectionChanged">
                     <ListView.Style>
@@ -104,7 +105,7 @@
                 <map:FlightMap x:Name="flightMap" />
             </TabItem>
         </TabControl>
-        <Grid Grid.Row="6" >
+        <Grid Grid.Row="5" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />

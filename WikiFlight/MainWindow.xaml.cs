@@ -21,7 +21,7 @@ namespace WikiFlight
 
         private readonly LogWindow logWindow = new LogWindow();
 
-        private readonly FlightSimulatorConnector flightSimulatorConnector;
+        private readonly FlightSimulatorConnection flightSimulatorConnection;
         private readonly WikipediaService wikipediaService = new WikipediaService();
 
         private readonly DispatcherTimer PositionRefreshTimer = new DispatcherTimer();
@@ -35,7 +35,7 @@ namespace WikiFlight
 
             Trace.Listeners.Add(new LogTraceListener(logWindow.txtLog));
 
-            flightSimulatorConnector = new MSFS2020Connector(OnConnected, OnPositionReceived, OnSimExited);
+            flightSimulatorConnection = new FlightSimulatorConnection(OnConnected, OnPositionReceived, OnSimExited);
 
             SetUi();
 
@@ -86,26 +86,27 @@ namespace WikiFlight
 
         private void PositionRequestTimerTick(object? sender, EventArgs e)
         {
-            flightSimulatorConnector.RequestCurrentPosition();
+            flightSimulatorConnection.RequestCurrentPosition();
         }
 
         private void Connect()
         {
             try
             {
-                flightSimulatorConnector.Connect();
-                flightSimulatorConnector.RequestCurrentPosition();
+                flightSimulatorConnection.Connect(settings.SimulatorConnector);
+                flightSimulatorConnection.RequestCurrentPosition();
             }
             catch (Exception exception)
             {
                 Trace.WriteLine(string.Format("Could not connect to simulator ({0})", exception.Message));
+                flightSimulatorConnection.Disconnect();
             }
         }
 
         private void Disconnect()
         {
             PositionRefreshTimer.Stop();
-            flightSimulatorConnector.Disconnect();
+            flightSimulatorConnection.Disconnect();
             wikipediaService.Reset();
             lstPages.Items.Clear();
             flightMap.clearMarkers();
@@ -114,10 +115,11 @@ namespace WikiFlight
 
         private void SetUi()
         {
-            bool connected = flightSimulatorConnector.IsConnected();
+            bool connected = flightSimulatorConnection.IsConnected();
 
             btnDisconnect.IsEnabled = connected;
             btnConnect.IsEnabled = !connected;
+            cmbSimulator.IsEnabled = !connected;
             cmbLanguageCode.IsEnabled = !connected;
             cmbRadius.IsEnabled = !connected;
             if (!connected)

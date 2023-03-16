@@ -1,9 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using WikiFlight.FlightSimulator;
 
 namespace WikiFlight
 {
     internal class Settings
     {
+        public Type SimulatorConnector { get; set; } = typeof(MSFS2020Connector);
+        public List<Simulator> SimulatorOptions { get; set; } = new List<Simulator>()
+        {
+            new Simulator("MS Flight Simulator 2020", typeof(MSFS2020Connector)),
+            new Simulator("Dummy", typeof(DummyConnector))
+        };
+        internal class Simulator
+        {
+            public Simulator(string name, Type connectorType)
+            {
+                Name = name;
+                ConnectorType = connectorType;
+            }
+
+            public string Name { get; }
+            public Type ConnectorType { get; }
+        }
+
         public int SearchRadiusInMeter { get; set; } = 3000;
         public List<int> SearchRadiusInMeterOptions { get; set; } = new List<int>() { 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000 };
 
