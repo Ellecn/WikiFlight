@@ -38,7 +38,16 @@ namespace WikiFlight.Wikipedia
 
         public Position Position { get; }
 
-        public double Distance { get; set; }
+        private double _distance;
+        public double Distance
+        {
+            get { return _distance; }
+            set
+            {
+                _distance = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Distance)));
+            }
+        }
 
         public string URL
         {
