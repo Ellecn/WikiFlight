@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using WikiFlight.Common;
+using WikiFlight.FlightSimulator;
 using WikiFlight.MSFS2020;
 using WikiFlight.Wikipedia;
 
@@ -20,7 +21,7 @@ namespace WikiFlight
 
         private readonly LogWindow logWindow = new LogWindow();
 
-        private readonly FlightSimulatorConnection flightSimulatorConnection;
+        private readonly FlightSimulatorConnector flightSimulatorConnector;
         private readonly WikipediaService wikipediaService = new WikipediaService();
 
         private readonly DispatcherTimer PositionRefreshTimer = new DispatcherTimer();
@@ -34,18 +35,12 @@ namespace WikiFlight
 
             Trace.Listeners.Add(new LogTraceListener(logWindow.txtLog));
 
-            flightSimulatorConnection = new FlightSimulatorConnection(OnConnected, OnPositionReceived, OnSimExited);
+            flightSimulatorConnector = new MSFS2020Connector(OnConnected, OnPositionReceived, OnSimExited);
 
             SetUi();
 
             PositionRefreshTimer.Interval = TimeSpan.FromSeconds(POSITION_REQUEST_INTERVAL_IN_SECONDS);
             PositionRefreshTimer.Tick += PositionRequestTimerTick;
-        }
-
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            base.OnSourceInitialized(e);
-            flightSimulatorConnection.Init(this);
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -91,15 +86,15 @@ namespace WikiFlight
 
         private void PositionRequestTimerTick(object? sender, EventArgs e)
         {
-            flightSimulatorConnection.RequestCurrentPosition();
+            flightSimulatorConnector.RequestCurrentPosition();
         }
 
         private void Connect()
         {
             try
             {
-                flightSimulatorConnection.Connect();
-                flightSimulatorConnection.RequestCurrentPosition();
+                flightSimulatorConnector.Connect();
+                flightSimulatorConnector.RequestCurrentPosition();
             }
             catch (Exception exception)
             {
@@ -110,7 +105,7 @@ namespace WikiFlight
         private void Disconnect()
         {
             PositionRefreshTimer.Stop();
-            flightSimulatorConnection.Disconnect();
+            flightSimulatorConnector.Disconnect();
             wikipediaService.Reset();
             lstPages.Items.Clear();
             flightMap.clearMarkers();
@@ -119,7 +114,7 @@ namespace WikiFlight
 
         private void SetUi()
         {
-            bool connected = flightSimulatorConnection.IsConnected();
+            bool connected = flightSimulatorConnector.IsConnected();
 
             btnDisconnect.IsEnabled = connected;
             btnConnect.IsEnabled = !connected;

@@ -5,65 +5,41 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using WikiFlight.Common;
+using WikiFlight.MSFS2020;
 
-namespace WikiFlight.MSFS2020
+namespace WikiFlight.FlightSimulator
 {
     /// <summary>
-    /// Connection to Microsoft Flight Simulator 2020.
+    /// Connector for the MS Flight Simulator 2020
     /// </summary>
-    public class FlightSimulatorConnection
+    public class MSFS2020Connector : FlightSimulatorConnector
     {
         private const int WM_USER_SIMCONNECT = 0x402;
         private IntPtr windowHandle;
         private SimConnect? simConnect;
 
-        public delegate void ConnectedHandler();
-        private readonly ConnectedHandler OnConnected;
-
-        public delegate void PositionReceivedHandler(Position currentPosition);
-        private readonly PositionReceivedHandler OnPositionReceived;
-
-        public delegate void SimExitedHandler();
-        private readonly SimExitedHandler OnSimExited;
-
-        /// <summary>
-        /// Creates a new FlightSimulatorService.
-        /// </summary>
-        /// <param name="onConnected">Event handler that is called when a connection to the simulator is established.</param>
-        /// <param name="onPositionReceived">Event handler that is called when new position data from the simualtor is received.</param>
-        /// <param name="onSimExited">Event handler that is called when the connection to the simulator is lost.</param>
-        public FlightSimulatorConnection(ConnectedHandler onConnected, PositionReceivedHandler onPositionReceived, SimExitedHandler onSimExited)
+        public MSFS2020Connector(ConnectedHandler onConnected, PositionReceivedHandler onPositionReceived, SimExitedHandler onSimExited) : base(onConnected, onPositionReceived, onSimExited)
         {
-            OnConnected = onConnected;
-            OnPositionReceived = onPositionReceived;
-            OnSimExited = onSimExited;
+            Init();
         }
 
         /// <summary>
-        /// Initializes the FlightSimulatorService. Important for receiving simulator events.
+        /// Initializes the MSFS2020Connector. Important for receiving simulator events.
         /// </summary>
-        /// <param name="window">The WPF main window.</param>
-        public void Init(Window window)
+        private void Init()
         {
-            windowHandle = new WindowInteropHelper(window).Handle;
+            windowHandle = new WindowInteropHelper(Application.Current.MainWindow).EnsureHandle();
 
             HwndSource handleSource = HwndSource.FromHwnd(windowHandle);
             handleSource.AddHook(HandleSimConnectEvents);
         }
 
-        /// <summary>
-        /// Indicates wether a connection to the simulator is established.
-        /// </summary>
-        /// <returns>true if connection is established, otherwise false.</returns>
-        public bool IsConnected()
+        public override bool IsConnected()
         {
             return simConnect != null;
         }
 
-        /// <summary>
-        /// Initiates a connection to the simulator. On success <see cref="OnConnected"/> will be called.
-        /// </summary>
-        public void Connect()
+        public override void Connect()
         {
             if (!IsConnected())
             {
@@ -87,10 +63,7 @@ namespace WikiFlight.MSFS2020
             }
         }
 
-        /// <summary>
-        /// Disconnects from the simulator.
-        /// </summary>
-        public void Disconnect()
+        public override void Disconnect()
         {
             if (IsConnected())
             {
@@ -100,10 +73,7 @@ namespace WikiFlight.MSFS2020
             Trace.WriteLine("Disconnected from sim");
         }
 
-        /// <summary>
-        /// Requests current position of the plane. On receiving <see cref="OnPositionReceived"/> is called.
-        /// </summary>
-        public void RequestCurrentPosition()
+        public override void RequestCurrentPosition()
         {
             if (IsConnected())
             {
