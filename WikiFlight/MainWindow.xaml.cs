@@ -112,7 +112,7 @@ namespace WikiFlight
             flightSimulatorConnection.Disconnect();
             wikipediaService.Reset();
             lstPages.Items.Clear();
-            flightMap.clearMarkers();
+            flightMap.clearMarkersAndCircle();
             SetUi();
         }
 

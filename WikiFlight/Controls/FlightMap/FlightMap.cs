@@ -64,10 +64,11 @@ namespace WikiFlight.Controls.FlightMap
             }
         }
 
-        public void clearMarkers()
+        public void clearMarkersAndCircle()
         {
             markers.Clear();
             ExecuteScriptAsync("clearMarkers();");
+            ExecuteScriptAsync("clearCircle();");
         }
 
         public void setCircle(Position position, int radius)
