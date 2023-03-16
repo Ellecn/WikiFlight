@@ -46,16 +46,14 @@ namespace WikiFlight.FlightSimulator
             try
             {
                 flightSimulatorConnector = Activator.CreateInstance(connectorType, this) as FlightSimulatorConnector;
+                if (flightSimulatorConnector != null)
+                {
+                    flightSimulatorConnector.Connect();
+                }
             }
             catch (Exception ex)
             {
                 Trace.WriteLine("Connector '" + connectorType + "' could not be created. (" + ex.Message + ")");
-                return;
-            }
-
-            if (flightSimulatorConnector != null)
-            {
-                flightSimulatorConnector.Connect();
             }
         }
 
