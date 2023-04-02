@@ -6,24 +6,6 @@ namespace WikiFlight
 {
     internal class Settings
     {
-        public Type SimulatorConnectionType { get; set; } = typeof(MSFS2020Connection);
-        public List<Simulator> SimulatorOptions { get; set; } = new List<Simulator>()
-        {
-            new Simulator("MS Flight Simulator 2020", typeof(MSFS2020Connection)),
-            new Simulator("Dummy simulator", typeof(DummySimulatorConnection))
-        };
-        internal class Simulator
-        {
-            public Simulator(string name, Type connectionType)
-            {
-                Name = name;
-                ConnectionType = connectionType;
-            }
-
-            public string Name { get; }
-            public Type ConnectionType { get; }
-        }
-
         public string WikipediaLanguageCode { get; set; } = "en";
         public List<WikipediaLanguage> WikipediaLanguageOptions { get; set; } = new List<WikipediaLanguage>()
         {

@@ -11,6 +11,7 @@
             <TextBlock Name="txtTitle" TextWrapping="Wrap" FontWeight="Bold" />
             <TextBlock Name="txtDistance" Margin="4 0 0 0" />
         </StackPanel>
-        <TextBlock Name="txtSummary" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"></TextBlock>
+        <TextBlock Name="txtURL" />
+        <TextBlock Name="txtSummary" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
     </StackPanel>
 </UserControl>

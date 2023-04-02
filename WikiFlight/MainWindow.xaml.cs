@@ -38,6 +38,7 @@ namespace WikiFlight
             Trace.Listeners.Add(new LogTraceListener(logWindow.txtLog));
 
             flightSimulatorConnection = new MSFS2020Connection(this);
+            //flightSimulatorConnection = new DummySimulatorConnection(this);
 
             SetUi();
 
@@ -75,11 +76,6 @@ namespace WikiFlight
         {
             try
             {
-                if (flightSimulatorConnection.GetType() != settings.SimulatorConnectionType)
-                {
-                    flightSimulatorConnection.Disconnect();
-                    flightSimulatorConnection = Activator.CreateInstance(settings.SimulatorConnectionType, this) as FlightSimulatorConnection;
-                }
                 flightSimulatorConnection.Connect();
             }
             catch (Exception exception)
@@ -104,7 +100,6 @@ namespace WikiFlight
 
             btnDisconnect.IsEnabled = connected;
             btnConnect.IsEnabled = !connected;
-            cmbSimulator.IsEnabled = !connected;
             cmbLanguageCode.IsEnabled = !connected;
             if (!connected)
             {
