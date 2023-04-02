@@ -11,23 +11,11 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" Margin="4">Wikipedia language:</TextBlock>
-            <ComboBox Grid.Row="0" Grid.Column="1" Margin="4 2 4 2" Name="cmbLanguageCode" ItemsSource="{Binding Path=WikipediaLanguageOptions}" DisplayMemberPath="Name" SelectedValuePath="Code" SelectedValue="{Binding Path=WikipediaLanguageCode}" />
-        </Grid>
-        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -35,27 +23,43 @@
             <Button Grid.Column="0" Margin="4" Padding="8 2 8 2" x:Name="btnConnect" Click="btnConnect_Click">Connect to simulator</Button>
             <Button Grid.Column="1" Margin="4" Padding="8 2 8 2" x:Name="btnDisconnect" Click="btnDisconnect_Click">Disconnect from simulator</Button>
         </Grid>
+        <Expander Grid.Row="1">
+            <Expander.Header>
+                <TextBlock>Details</TextBlock>
+            </Expander.Header>
+            <StackPanel Orientation="Vertical">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="4">Wikipedia language:</TextBlock>
+                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="4 2 4 2" Name="cmbLanguageCode" ItemsSource="{Binding Path=WikipediaLanguageOptions}" DisplayMemberPath="Name" SelectedValuePath="Code" SelectedValue="{Binding Path=WikipediaLanguageCode}" />
+                </Grid>
+                <TextBlock Margin="4" Text="Aircraft position" FontWeight="Bold" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="4">Latitude:</TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="4">Longitude:</TextBlock>
+                    <TextBox Grid.Row="0" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLatitude">n/a</TextBox>
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLongitude">n/a</TextBox>
+                </Grid>
+            </StackPanel>
+        </Expander>
         <Separator Grid.Row="2" />
-        <StackPanel Grid.Row="3" Orientation="Vertical">
-            <TextBlock Margin="4" Text="Aircraft position" FontWeight="Bold" />
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Margin="4">Latitude:</TextBlock>
-                <TextBlock Grid.Row="1" Grid.Column="0" Margin="4">Longitude:</TextBlock>
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLatitude">n/a</TextBox>
-                <TextBox Grid.Row="1" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLongitude">n/a</TextBox>
-            </Grid>
-        </StackPanel>
+        <common:WikipediaPageView x:Name="wikipediaPageView" Grid.Row="3" Margin="4"></common:WikipediaPageView>
         <Separator Grid.Row="4" />
-        <common:WikipediaPageView x:Name="wikipediaPageView" Grid.Row="5" Margin="4"></common:WikipediaPageView>
-        <Grid Grid.Row="6" >
+        <Grid Grid.Row="5" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />

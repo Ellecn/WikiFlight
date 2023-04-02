@@ -22,7 +22,7 @@ namespace WikiFlight
 
         private readonly LogWindow logWindow = new LogWindow();
 
-        private FlightSimulatorConnection flightSimulatorConnection;
+        private readonly FlightSimulatorConnection flightSimulatorConnection;
 
         private readonly WikipediaService wikipediaService = new WikipediaService();
 
