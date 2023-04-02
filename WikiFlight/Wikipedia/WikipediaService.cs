@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WikiFlight.Common;
 
@@ -8,40 +8,36 @@ namespace WikiFlight.Wikipedia
     public class WikipediaService
     {
         private readonly WikipediaClient wikipediaClient = new WikipediaClient();
-        private readonly WikipediaPageCache wikipediaPageCache = new WikipediaPageCache();
 
-        private Position? positionOfLastPageRequest;
-        private DateTime? timeStampOfLastPageRequest;
-
-        public async Task<List<WikipediaPage>> GetPagesNearby(string languageCode, Position position, int radius)
+        /// <summary>
+        /// Searches for wikipedia pages within a radius of 5000m and returns the nearest page.
+        /// </summary>
+        /// <param name="languageCode"></param>
+        /// <param name="position"></param>
+        /// <param name="currentPage"></param>
+        /// <returns></returns>
+        public async Task<WikipediaPage?> GetNextPage(string languageCode, Position position, WikipediaPage? currentPage)
         {
-            if (ShouldLoadNewWikipediaPages(position))
+            List<WikipediaPage> pages = await wikipediaClient.GetPages(languageCode, position, 5000);
+            if(pages.Count == 0)
             {
-                var pages = await wikipediaClient.GetPages(languageCode, position, 10000);
-                positionOfLastPageRequest = position;
-                timeStampOfLastPageRequest = DateTime.Now;
+                return null;
+            }
+            pages.ForEach(p => p.Distance = position.GetDistance(p.Position));
+            WikipediaPage nearestPage = pages.OrderBy(p => p.Distance).First();
 
-                wikipediaPageCache.AddNewPagesOnly(pages);
+            string? summary = await GetSummary(nearestPage);
+            if (summary != null)
+            {
+                nearestPage.Summary = summary;
             }
 
-            return wikipediaPageCache.Get(languageCode, position, radius);
-        }
-
-        public void Reset()
-        {
-            positionOfLastPageRequest = null;
-            timeStampOfLastPageRequest = null;
+            return nearestPage;
         }
 
         public async Task<string?> GetSummary(WikipediaPage wikipediaPage)
         {
             return await wikipediaClient.GetSummary(wikipediaPage);
-        }
-
-        private bool ShouldLoadNewWikipediaPages(Position currentPosition)
-        {
-            return positionOfLastPageRequest == null
-                || (currentPosition.GetDistance(positionOfLastPageRequest) > 1000 && DateTime.Now.Subtract(timeStampOfLastPageRequest.Value) > TimeSpan.FromSeconds(3));
         }
     }
 }

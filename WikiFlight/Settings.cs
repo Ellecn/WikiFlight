@@ -24,9 +24,6 @@ namespace WikiFlight
             public Type ConnectionType { get; }
         }
 
-        public int SearchRadiusInMeter { get; set; } = 3000;
-        public List<int> SearchRadiusInMeterOptions { get; set; } = new List<int>() { 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000 };
-
         public string WikipediaLanguageCode { get; set; } = "en";
         public List<WikipediaLanguage> WikipediaLanguageOptions { get; set; } = new List<WikipediaLanguage>()
         {

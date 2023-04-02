@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Threading;
 using WikiFlight.Common;
 using WikiFlight.FlightSimulator;
@@ -17,6 +15,10 @@ namespace WikiFlight
     public partial class MainWindow : Window, IFlightSimulatorEventListener
     {
         private readonly int POSITION_REQUEST_INTERVAL_IN_SECONDS = 1;
+
+        private readonly int MIN_PAGE_DISPLAY_TIME_IN_SECONDS = 20;
+        private DateTime timeAtLastDisplayChange = DateTime.MinValue;
+        private Position positionAtLastDisplayChange = new Position(0, 0);
 
         private readonly LogWindow logWindow = new LogWindow();
 
@@ -59,29 +61,9 @@ namespace WikiFlight
             Disconnect();
         }
 
-        private void lstPages_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (lstPages.SelectedItem is WikipediaPage selectedPage)
-            {
-                lstPages.SelectedIndex = -1;
-                Process.Start("explorer", string.Format("\"{0}\"", selectedPage.URL));
-            }
-        }
-
         private void btnOpenLog_Click(object sender, RoutedEventArgs e)
         {
             logWindow.Show();
-        }
-
-        private async void ListViewExpander_Expanded(object sender, RoutedEventArgs e)
-        {
-            Expander expander = (Expander)sender;
-            WikipediaPage wikipediaPage = (WikipediaPage)expander.DataContext;
-            if (string.IsNullOrEmpty(wikipediaPage.Summary))
-            {
-                string? summary = await wikipediaService.GetSummary(wikipediaPage);
-                wikipediaPage.Summary = summary ?? "";
-            }
         }
 
         private void PositionRequestTimerTick(object? sender, EventArgs e)
@@ -110,10 +92,10 @@ namespace WikiFlight
         {
             PositionRefreshTimer.Stop();
             flightSimulatorConnection.Disconnect();
-            wikipediaService.Reset();
-            lstPages.Items.Clear();
-            flightMap.clearMarkersAndCircle();
             SetUi();
+
+            timeAtLastDisplayChange = DateTime.MinValue;
+            positionAtLastDisplayChange = new Position(0, 0);
         }
 
         private void SetUi()
@@ -124,11 +106,11 @@ namespace WikiFlight
             btnConnect.IsEnabled = !connected;
             cmbSimulator.IsEnabled = !connected;
             cmbLanguageCode.IsEnabled = !connected;
-            cmbRadius.IsEnabled = !connected;
             if (!connected)
             {
                 txtLatitude.Text = "n/a";
                 txtLongitude.Text = "n/a";
+                wikipediaPageView.Page = null;
             }
         }
 
@@ -145,21 +127,28 @@ namespace WikiFlight
             txtLatitude.Text = position.Latitude.ToString();
             txtLongitude.Text = position.Longitude.ToString();
 
-            var pagesNearby = await wikipediaService.GetPagesNearby(settings.WikipediaLanguageCode, position, settings.SearchRadiusInMeter);
-
-            if (tabList.IsSelected)
+            if (wikipediaPageView.Page != null)
             {
-                if (!AreTheSame(pagesNearby, lstPages.Items))
-                {
-                    lstPages.Items.Clear();
-                    pagesNearby.ForEach(p => lstPages.Items.Add(p));
-                }
+                wikipediaPageView.Page.Distance = wikipediaPageView.Page.Position.GetDistance(position);
+                wikipediaPageView.RefreshUi();
             }
 
-            if (tabMap.IsSelected)
+            DateTime now = DateTime.Now;
+
+            if ((now - timeAtLastDisplayChange).TotalSeconds >= MIN_PAGE_DISPLAY_TIME_IN_SECONDS && positionAtLastDisplayChange.GetDistance(position) > 10.0)
             {
-                flightMap.setCircle(position, settings.SearchRadiusInMeter);
-                flightMap.addNewMarkers(pagesNearby);
+                WikipediaPage? nextPage = await wikipediaService.GetNextPage(settings.WikipediaLanguageCode, position, wikipediaPageView.Page);
+
+                if (nextPage == null)
+                {
+                    wikipediaPageView.Page = null;
+                }
+                else if (wikipediaPageView.Page == null || nextPage != wikipediaPageView.Page)
+                {
+                    wikipediaPageView.Page = nextPage;
+                    timeAtLastDisplayChange = now;
+                    positionAtLastDisplayChange = position;
+                }
             }
         }
 
@@ -169,10 +158,5 @@ namespace WikiFlight
         }
 
         #endregion
-
-        private static bool AreTheSame(List<WikipediaPage> list, ItemCollection itemCollection)
-        {
-            return list.Count == itemCollection.Count && list.TrueForAll(p => itemCollection.Contains(p));
-        }
     }
 }

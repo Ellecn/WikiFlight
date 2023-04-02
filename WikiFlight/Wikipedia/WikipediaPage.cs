@@ -25,29 +25,11 @@ namespace WikiFlight.Wikipedia
 
         public string Title { get; }
 
-        private string _summary = "";
-        public string Summary
-        {
-            get { return _summary; }
-            set
-            {
-                _summary = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Summary)));
-            }
-        }
+        public string Summary { get; set; }
 
         public Position Position { get; }
 
-        private double _distance;
-        public double Distance
-        {
-            get { return _distance; }
-            set
-            {
-                _distance = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Distance)));
-            }
-        }
+        public double Distance { get; set; }
 
         public string URL
         {
