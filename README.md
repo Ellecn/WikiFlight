@@ -1,6 +1,6 @@
 # WikiFlight
 
-**WikiFlight** is a small Windows application that connects to MS Flight Simulator (MSFS2020). While connected to it, it displays pages from Wikipedia about things nearby your aircraft.
+**WikiFlight** is a small Windows application that connects to MS Flight Simulator 2020. While connected to it, it displays pages from Wikipedia about things nearby your aircraft.
 
 No installation is required to run **WikiFlight**.
 
