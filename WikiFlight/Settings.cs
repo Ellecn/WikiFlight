@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using WikiFlight.FlightSimulator;
+﻿using System.Collections.Generic;
 
 namespace WikiFlight
 {
@@ -9,26 +7,26 @@ namespace WikiFlight
         public string WikipediaLanguageCode { get; set; } = "en";
         public List<WikipediaLanguage> WikipediaLanguageOptions { get; set; } = new List<WikipediaLanguage>()
         {
-            new WikipediaLanguage("English", "en"),
-            new WikipediaLanguage("French", "fr"),
-            new WikipediaLanguage("German", "de"),
-            new WikipediaLanguage("Japanese", "ja"),
-            new WikipediaLanguage("Spanish", "es"),
-            new WikipediaLanguage("Russian", "ru"),
-            new WikipediaLanguage("Chinese", "zh"),
-            new WikipediaLanguage("Italian", "it"),
-            new WikipediaLanguage("Portuguese", "pt"),
-            new WikipediaLanguage("Persian", "fa"),
-            new WikipediaLanguage("Arabic", "ar"),
-            new WikipediaLanguage("Polish", "pl"),
-            new WikipediaLanguage("Dutch", "nl"),
-            new WikipediaLanguage("Ukrainian", "uk"),
-            new WikipediaLanguage("Hebrew", "he"),
-            new WikipediaLanguage("Turkish", "tr"),
-            new WikipediaLanguage("Indonesian", "id"),
-            new WikipediaLanguage("Czech", "cs"),
-            new WikipediaLanguage("Vietnamese", "vi"),
-            new WikipediaLanguage("Swedish", "sv")
+            new WikipediaLanguage("English (en)", "en"),
+            new WikipediaLanguage("French (fr)", "fr"),
+            new WikipediaLanguage("German (de)", "de"),
+            new WikipediaLanguage("Japanese (ja)", "ja"),
+            new WikipediaLanguage("Spanish (es)", "es"),
+            new WikipediaLanguage("Russian (ru)", "ru"),
+            new WikipediaLanguage("Chinese (zh)", "zh"),
+            new WikipediaLanguage("Italian (it)", "it"),
+            new WikipediaLanguage("Portuguese (pt)", "pt"),
+            new WikipediaLanguage("Persian (fa)", "fa"),
+            new WikipediaLanguage("Arabic (ar)", "ar"),
+            new WikipediaLanguage("Polish (pl)", "pl"),
+            new WikipediaLanguage("Dutch (nl)", "nl"),
+            new WikipediaLanguage("Ukrainian (uk)", "uk"),
+            new WikipediaLanguage("Hebrew (he)", "he"),
+            new WikipediaLanguage("Turkish (tr)", "tr"),
+            new WikipediaLanguage("Indonesian (id)", "id"),
+            new WikipediaLanguage("Czech (cs)", "cs"),
+            new WikipediaLanguage("Vietnamese (vi)", "vi"),
+            new WikipediaLanguage("Swedish (sv)", "sv")
             // TODO: mehr
         };
 

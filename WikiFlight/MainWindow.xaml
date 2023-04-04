@@ -40,8 +40,8 @@
                 </StackPanel>
             </GroupBox>
         </Grid>
-        <common:WikipediaPageView x:Name="wikipediaPageView" Grid.Row="1" Margin="4" />
-        <Separator Grid.Row="2" />
+        <common:WikipediaPageView x:Name="wikipediaPageView" Grid.Row="1" Margin="4 0 4 0" />
+        <Separator Grid.Row="2" Margin="0" />
         <Grid Grid.Row="3" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -50,7 +50,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Margin="2">Aircraft position (lat, lon):</TextBlock>
             <TextBlock Grid.Column="1" Name="txtPosition" Margin="2">54.146100, 13.768800</TextBlock>
-            <Button Grid.Column="2" Margin="2" HorizontalAlignment="Right" Name="btnOpenLog" Click="btnOpenLog_Click">Show log</Button>
+            <Button Grid.Column="2" Margin="2" Name="btnOpenLog" Click="btnOpenLog_Click">Show log</Button>
         </Grid>
     </Grid>
 </Window>
