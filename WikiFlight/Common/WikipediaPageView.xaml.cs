@@ -30,23 +30,20 @@ namespace WikiFlight.Common
                 _page = value;
                 if (_page != null)
                 {
-                    txtTitle.Text = _page.Title;
-                    txtDistance.Text = string.Format("({0}m away)", _page.Distance);
-
-                    txtURL.Inlines.Clear();
+                    txtTitle.Inlines.Clear();
                     Hyperlink hyperlink = new Hyperlink();
                     hyperlink.NavigateUri = new Uri(_page.URL);
-                    hyperlink.Inlines.Add("Open in bworser");
+                    hyperlink.Inlines.Add(_page.Title);
                     hyperlink.RequestNavigate += Hyperlink_RequestNavigate;
-                    txtURL.Inlines.Add(hyperlink);
+                    txtTitle.Inlines.Add(hyperlink);
 
+                    txtDistance.Text = string.Format("Distance: {0}m", _page.Distance);
                     txtSummary.Text = _page.Summary;
                 }
                 else
                 {
-                    txtTitle.Text = string.Empty;
+                    txtTitle.Inlines.Clear();
                     txtDistance.Text = string.Empty;
-                    txtURL.Inlines.Clear();
                     txtSummary.Text = string.Empty;
                 }
             }
@@ -56,7 +53,7 @@ namespace WikiFlight.Common
         {
             if (_page != null)
             {
-                txtDistance.Text = string.Format("({0}m away)", _page.Distance);
+                txtDistance.Text = string.Format("Distance: {0}m", _page.Distance);
             }
         }
 

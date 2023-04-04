@@ -5,11 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WikiFlight" xmlns:common="clr-namespace:WikiFlight.Common"
         mc:Ignorable="d"
-        Title="WikiFlight" Height="500" Width="400" x:Name="mainWindow">
+        Title="WikiFlight 1.0-dev" Height="500" Width="400" x:Name="mainWindow">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -17,57 +15,42 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Margin="4" Padding="8 2 8 2" x:Name="btnConnect" Click="btnConnect_Click">Connect to simulator</Button>
-            <Button Grid.Column="1" Margin="4" Padding="8 2 8 2" x:Name="btnDisconnect" Click="btnDisconnect_Click">Disconnect from simulator</Button>
+            <GroupBox Header="Settings" Grid.Column="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0">Wikipedia language:</Label>
+                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="2" Name="cmbLanguageCode" ItemsSource="{Binding Path=WikipediaLanguageOptions}" DisplayMemberPath="Name" SelectedValuePath="Code" SelectedValue="{Binding Path=WikipediaLanguageCode}" />
+                    <CheckBox Grid.Row="1" Grid.ColumnSpan="2" Margin="4" IsChecked="{Binding ElementName=mainWindow, Path=Topmost}">Always on top</CheckBox>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Simulator" Grid.Column="1">
+                <StackPanel Orientation="Vertical">
+                    <Button Margin="2" Padding="8 2 8 2" Name="btnConnect" Click="btnConnect_Click">Connect</Button>
+                    <Button Margin="2" Padding="8 2 8 2" Name="btnDisconnect" Click="btnDisconnect_Click">Disconnect</Button>
+                </StackPanel>
+            </GroupBox>
         </Grid>
-        <Expander Grid.Row="1">
-            <Expander.Header>
-                <TextBlock>Details</TextBlock>
-            </Expander.Header>
-            <StackPanel Orientation="Vertical">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="4">Wikipedia language:</TextBlock>
-                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="4 2 4 2" Name="cmbLanguageCode" ItemsSource="{Binding Path=WikipediaLanguageOptions}" DisplayMemberPath="Name" SelectedValuePath="Code" SelectedValue="{Binding Path=WikipediaLanguageCode}" />
-                </Grid>
-                <TextBlock Margin="4" Text="Aircraft position" FontWeight="Bold" />
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="4">Latitude:</TextBlock>
-                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="4">Longitude:</TextBlock>
-                    <TextBox Grid.Row="0" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLatitude">n/a</TextBox>
-                    <TextBox Grid.Row="1" Grid.Column="1" Margin="4" IsReadOnly="True" x:Name="txtLongitude">n/a</TextBox>
-                </Grid>
-            </StackPanel>
-        </Expander>
+        <common:WikipediaPageView x:Name="wikipediaPageView" Grid.Row="1" Margin="4" />
         <Separator Grid.Row="2" />
-        <common:WikipediaPageView x:Name="wikipediaPageView" Grid.Row="3" Margin="4"></common:WikipediaPageView>
-        <Separator Grid.Row="4" />
-        <Grid Grid.Row="5" >
+        <Grid Grid.Row="3" >
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <CheckBox Grid.Column="0" Margin="4" HorizontalAlignment="Left" IsChecked="{Binding ElementName=mainWindow, Path=Topmost}">Always on top</CheckBox>
-            <TextBlock Grid.Column="1" Margin="4" HorizontalAlignment="Center">Version 1.0-dev</TextBlock>
-            <Button Grid.Column="2" Margin="4" HorizontalAlignment="Right" x:Name="btnOpenLog" Click="btnOpenLog_Click">Show log</Button>
+            <TextBlock Grid.Column="0" Margin="2">Aircraft position (lat, lon):</TextBlock>
+            <TextBlock Grid.Column="1" Name="txtPosition" Margin="2">54.146100, 13.768800</TextBlock>
+            <Button Grid.Column="2" Margin="2" HorizontalAlignment="Right" Name="btnOpenLog" Click="btnOpenLog_Click">Show log</Button>
         </Grid>
     </Grid>
 </Window>

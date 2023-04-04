@@ -103,8 +103,7 @@ namespace WikiFlight
             cmbLanguageCode.IsEnabled = !connected;
             if (!connected)
             {
-                txtLatitude.Text = "n/a";
-                txtLongitude.Text = "n/a";
+                txtPosition.Text = "n/a";
                 wikipediaPageView.Page = null;
             }
         }
@@ -119,8 +118,7 @@ namespace WikiFlight
 
         public async void OnPositionReceived(Position position)
         {
-            txtLatitude.Text = position.Latitude.ToString();
-            txtLongitude.Text = position.Longitude.ToString();
+            txtPosition.Text = string.Format("{0}, {1}", Math.Round(position.Latitude, 6), Math.Round(position.Longitude, 6));
 
             if (wikipediaPageView.Page != null)
             {
