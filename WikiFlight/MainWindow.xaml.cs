@@ -67,6 +67,11 @@ namespace WikiFlight
             logWindow.Show();
         }
 
+        private void cmbLanguageCode_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            Reset();
+        }
+
         private void PositionRequestTimerTick(object? sender, EventArgs e)
         {
             flightSimulatorConnection.RequestCurrentPosition();
@@ -90,8 +95,7 @@ namespace WikiFlight
             flightSimulatorConnection.Disconnect();
             SetUi();
 
-            timeAtLastDisplayChange = DateTime.MinValue;
-            positionAtLastDisplayChange = new Position(0, 0);
+            Reset();
         }
 
         private void SetUi()
@@ -100,12 +104,17 @@ namespace WikiFlight
 
             btnDisconnect.IsEnabled = connected;
             btnConnect.IsEnabled = !connected;
-            cmbLanguageCode.IsEnabled = !connected;
             if (!connected)
             {
                 txtPosition.Text = "n/a";
                 wikipediaPageView.Page = null;
             }
+        }
+
+        private void Reset()
+        {
+            timeAtLastDisplayChange = DateTime.MinValue;
+            positionAtLastDisplayChange = new Position(0, 0);
         }
 
         #region IFlightSimulatorEventListener implementation

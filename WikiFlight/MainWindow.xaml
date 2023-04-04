@@ -29,7 +29,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Label Grid.Row="0" Grid.Column="0">Wikipedia language:</Label>
-                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="2" Name="cmbLanguageCode" ItemsSource="{Binding Path=WikipediaLanguageOptions}" DisplayMemberPath="Name" SelectedValuePath="Code" SelectedValue="{Binding Path=WikipediaLanguageCode}" />
+                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="2" Name="cmbLanguageCode" ItemsSource="{Binding Path=WikipediaLanguageOptions}" DisplayMemberPath="Name" SelectedValuePath="Code" SelectedValue="{Binding Path=WikipediaLanguageCode}" SelectionChanged="cmbLanguageCode_SelectionChanged" />
                     <CheckBox Grid.Row="1" Grid.ColumnSpan="2" Margin="4" IsChecked="{Binding ElementName=mainWindow, Path=Topmost}">Always on top</CheckBox>
                 </Grid>
             </GroupBox>
